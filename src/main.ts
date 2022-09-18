@@ -5,12 +5,13 @@ import { loadFonts } from './plugins/webfontloader'
 import { createPinia } from 'pinia'
 import mitt from 'mitt'
 
-type ol = { type: string, name: string, lnglat?: [number, number], id: number, desc?: string }
+type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
 type Events = {
     ln: string,
     udl: ol[],
     sfv: any,
-    sr: string
+    sr: string,
+    fo: [number, number]
 }
 
 const Mit = mitt<Events>()

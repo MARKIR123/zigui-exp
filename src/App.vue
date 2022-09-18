@@ -78,8 +78,8 @@
         </v-list-item>
 
         <v-divider></v-divider>
-        <!-- <v-expansion-panels focusable>
-          <v-expansion-panel v-for="(ol, i) in Overlays" :key="i">
+        <v-expansion-panels focusable>
+          <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="emitFO(ol['lnglat'])">
             <v-expansion-panel-title class="font-weight-thin">
               <v-icon v-if="ol.type == 'point'">
                 mdi-map-marker
@@ -87,7 +87,10 @@
               <v-icon v-else-if="ol['type'] == 'polyline'">
                 mdi-vector-polyline
               </v-icon>
-              {{ol['name']}}
+              <v-list-item-title>
+                {{ol['name']}}
+              </v-list-item-title>
+
             </v-expansion-panel-title>
             <v-expansion-panel-text class="font-weight-thin">
               ID:{{ol['id']}}
@@ -102,20 +105,17 @@
               描述:{{ol['desc']}}
             </v-expansion-panel-text>
           </v-expansion-panel>
-        </v-expansion-panels> -->
-        <v-list-group v-for="ol, i in Overlays" :key="i" prepend-icon="mdi-map-marker"
-          no-action>
-          <template v-slot:activator>
-              <v-list-item-title v-text="ol.name"></v-list-item-title>
-          </template>
+        </v-expansion-panels>
 
-          <v-list-item>
-              <v-list-item-title v-text="111"></v-list-item-title>
-          </v-list-item>
-        </v-list-group>
       </v-navigation-drawer>
-
-
+      <!-- <v-card max-width="64">
+        <v-btn @click="del">
+          delete
+        </v-btn>
+        <v-btn @click="del">
+          edit
+        </v-btn>
+      </v-card> -->
     </v-main>
   </v-app>
 </template>
@@ -142,13 +142,17 @@ export default defineComponent({
       ],
       routes: [
         { title: '三峡大坝实习路线', value: 'sanxia' },
-
+        { title: '张家冲实习路线', value: 'zhangjiachong' },
+        { title: '链子崖实习路线', value: 'lianziya' },
+        { title: '屈原故里实习路线', value: 'quyuan' },
+        { title: '泗溪公园实习路线', value: 'sixigongyuan' },
+        { title: '棺材岩实习路线', value: 'lianziya' },
       ],
     }
   },
 
   setup() {
-    type ol = { type: string, name: string, lnglat?: [number, number], id: number, desc?: string }
+    type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
     const instance = getCurrentInstance();
     var currentRoute = ref('')
     var Overlays: ol[] = reactive([])
@@ -162,9 +166,28 @@ export default defineComponent({
 
     const emitLS = (r: string) => {
       instance?.proxy?.$Bus.emit('sr', r)
-      if (r = 'sanxia') {
+      if (r == 'sanxia') {
         currentRoute.value = '三峡实习路线';
       }
+      else if (r == 'zhangjiachong') {
+        currentRoute.value = '张家冲实习路线';
+      }
+      else if (r == 'sixigongyuan') {
+        currentRoute.value = '泗溪公园实习路线';
+      }
+      else if (r == 'quyuan') {
+        currentRoute.value = '屈原故里实习路线';
+      }
+      else if (r == 'lianziya') {
+        currentRoute.value = '链子崖实习路线';
+      }
+      else if (r == 'guancaiyan') {
+        currentRoute.value = '花鸡坡-棺材岩实习路线';
+      }
+    }
+
+    const emitFO = (lnglat: [number, number]) => {
+      instance?.proxy?.$Bus.emit('fo', lnglat)
     }
 
     instance?.proxy?.$Bus.on('udl', (l) => {
@@ -182,6 +205,7 @@ export default defineComponent({
       emitSL,
       emitFV,
       emitLS,
+      emitFO,
       print,
       currentRoute,
       Overlays
@@ -204,12 +228,8 @@ export default defineComponent({
   --v-icon-size-multiplier: 1.6;
 }
 
-.v-navigation-drawer {
-  overflow: hidden;
-}
-
 .v-navigation-drawer__content {
-  overflow-y: hidden;
+  overflow-y: hidden !important;
 }
 
 .v-expansion-panel {
@@ -219,5 +239,13 @@ export default defineComponent({
   transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: margin-top, border-radius, border, max-width;
   border-radius: 4px;
+}
+
+.v-expansion-panel .v-expansion-panel-title #text {
+  overflow: hidden !important;
+}
+
+.v-icon {
+  color: #616161;
 }
 </style>

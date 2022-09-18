@@ -23,7 +23,7 @@ var Siconselect: AMap.Icon;
 
 const olstore = useStore()
 
-type ol = { type: string, name: string, lnglat?: [number, number], id: number, desc?: string }
+type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
 
 //进行地图初始化
 function initMap() {
@@ -73,15 +73,17 @@ function initMap() {
                 imageSize: new AMap.Size(40, 50)
             });
 
-            // var path: any[] = []
+            //var path: any[] = []
 
-            // map.on('click', function (e: any) {
-            //     path.push([e.lnglat.lng, e.lnglat.lat])
-            //     console.log(path)
-            // })
+            map.on('click', function (e: any) {
+                
+                console.log([e.lnglat.lng, e.lnglat.lat]);
+                // path.push([e.lnglat.lng, e.lnglat.lat])
+                // console.log(path)
+            })
 
             watch(Overlays, (newv, oldv) => {
-                let oll: ol[] = [];
+                let oll: (AMap.Marker | AMap.Polyline)[] = [];
                 newv.eachOverlay((overlay: AMap.Polyline | AMap.Marker, index: number, collections: any) => {
                     let t: ol = { type: '', name: '', lnglat: [0, 0], id: 0, desc: '' }
                     let extData = overlay.getExtData();
@@ -92,7 +94,6 @@ function initMap() {
                     t.desc = extData['desc']
                     oll.push(t)
                 })
-                console.log('oll:', oll);
                 emitUplist(oll)
             })
 
@@ -111,15 +112,22 @@ instance?.proxy?.$Bus.on('sfv', () => {
 })
 
 instance?.proxy?.$Bus.on('sr', (r) => {
+    map.clearMap();
+    //console.log(Overlays.getOverlays());
+    Overlays.clearOverlays();
     drawSpots.drawSpots(r, map, Overlays, Sicon, Siconselect)
     drawRoute.drawRoute(r, map, Overlays)
+})
+
+instance?.proxy?.$Bus.on('fo', (lnglat) => {
+    map.setZoomAndCenter(19, lnglat, false)
 })
 
 const emitUplist = (l: any) => {
     instance?.proxy?.$Bus.emit('udl', l)
 }
 
-    initMap();
+initMap();
 </script>
   
 <style>

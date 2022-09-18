@@ -15,10 +15,10 @@ function drawRoute(name: any, map: any, overlay: AMap.OverlayGroup) {
             lineCap: 'round',
             extData: {
                 type: 'polyline',
-                id: 1,
+                id: 0,
                 name: '',
                 lnglat: [0, 0],
-                desc: ''
+                desc: Routes[name].desc
             }
         });
 
