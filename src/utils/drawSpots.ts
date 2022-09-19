@@ -7,7 +7,7 @@ import { RouteSpots } from "../index/spotIndex";
 
 // }
 
-function drawSpots(name: any, map: any, overlays: AMap.OverlayGroup, icon: any, iconselect: any) {
+function drawSpots(name: any, map: AMap.Map, overlays: AMap.OverlayGroup, icon: any, iconselect: any) {
     let spotList: Array<any> = RouteSpots[name]
     let markers: Array<AMap.Marker> = [];
     AMapLoader.load({
@@ -42,16 +42,15 @@ function drawSpots(name: any, map: any, overlays: AMap.OverlayGroup, icon: any, 
             });
 
             infoWindow.setContent(
-                `<img src=${url} width='350' height='250' >\
-            <div>\
-                <p>拍摄地点: ${sspot}</p>\
-                <p>拍摄时间: ${sdate}</p>\
-                <p>拍摄者: ${author}</p>\
-                <p>描述: ${desc}</p>\
-            </div>\
-            `
+                `<div style="overflow: visible; width: 600px;height:min-content;background-color:#FFFFFF; border-radius: 30px;padding: 6px 0px 6px 0px;">
+                <p style="padding-left: 2rem;font-size: 32px;font-family: 'Microsoft JhengHei'">${sspot}</p>
+                <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei';color: #424242">By  ${author}</p>
+                <div>
+                    <img src=${url} style="margin-left: -6px;margin-right: -6px;"  width="612"/>
+                </div>
+                <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei'"">${desc}</p>
+            </div>`
             );
-
 
             marker.on('mouseover', function () {
                 marker.setIcon(iconselect)
@@ -60,12 +59,13 @@ function drawSpots(name: any, map: any, overlays: AMap.OverlayGroup, icon: any, 
 
             marker.on('mouseout', function () {
                 marker.setIcon(icon)
-                infoWindow.close(map, coord)
+                infoWindow.close(map)
             })
 
             marker.on('rightclick', function (e: any) {
                 let spotMenu: AMap.ContextMenu = new AMap.ContextMenu({
                     isCustom: true,
+                    
                     // content: "<div class='v-card v-theme--light v-card--density-default v-card--variant-elevated' style='max-width: 64px;'><!---->\
                     // <div class='v-card__loader'><div class='v-progress-linear v-theme--light' role='progressbar' aria-valuemin='0' aria-valuemax='100' style='height: 0px; --v-progress-linear-height:2px;'><!---->\
                     // <div class='v-progress-linear__background' style='width: 100%;'></div><div class='v-progress-linear__indeterminate'><div class='v-progress-linear__indeterminate long'></div><div class='v-progress-linear__indeterminate short'></div></div><!----></div></div><!----><!---->\
@@ -74,16 +74,10 @@ function drawSpots(name: any, map: any, overlays: AMap.OverlayGroup, icon: any, 
                 });
 
                 spotMenu.addItem("删除", function () {
-                    console.log(marker.getExtData()['del']());
-
-                    //marker.remove()
+                    marker.remove()
                     overlays.removeOverlay(marker)
                     spotMenu.close()
                 }, 1)
-
-                spotMenu.addItem("编辑", function () {
-                    spotMenu.close()
-                }, 2)
 
                 spotMenu.open(map, e.lnglat);
             });
@@ -93,13 +87,17 @@ function drawSpots(name: any, map: any, overlays: AMap.OverlayGroup, icon: any, 
                 id: i++,
                 name: sspot,
                 lnglat: coord,
-                desc: '',
+                desc: desc,
                 del: () => {
                     marker.remove()
                 },
                 onActive: () => {
                     marker.setIcon(iconselect)
                     infoWindow.open(map, coord)
+                },
+                onPassive: () => {
+                    marker.setIcon(icon)
+                    infoWindow.close(map, coord)
                 }
             })
 

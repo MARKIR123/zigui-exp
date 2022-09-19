@@ -12,6 +12,7 @@ import drawRoute from "../utils/drawRoute"
 import setSource from "../utils/setSource";
 import fitView from "../utils/fitView";
 import { useStore } from "../index/overlayindex"
+import { extData } from '../utils/type'
 
 var map: AMap.Map;
 
@@ -22,8 +23,6 @@ var Sicon: AMap.Icon;
 var Siconselect: AMap.Icon;
 
 const olstore = useStore()
-
-type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
 
 //进行地图初始化
 function initMap() {
@@ -44,6 +43,7 @@ function initMap() {
                 //设置地图容器id
                 viewMode: "3D", //是否为3D地图模式
                 terrain: true,
+                zooms: [2, 23],
                 zoom: 10, //初始化地图级别
                 center: [111.274722, 30.738333], //初始化地图中心点位置
                 layers: [
@@ -83,16 +83,16 @@ function initMap() {
             })
 
             watch(Overlays, (newv, oldv) => {
-                let oll: (AMap.Marker | AMap.Polyline)[] = [];
+                let oll: extData[] = [];
                 newv.eachOverlay((overlay: AMap.Polyline | AMap.Marker, index: number, collections: any) => {
-                    let t: ol = { type: '', name: '', lnglat: [0, 0], id: 0, desc: '' }
-                    let extData = overlay.getExtData();
-                    t.type = extData['type']
-                    t.name = extData['name']
-                    t.lnglat = extData['lnglat']
-                    t.id = extData['id']
-                    t.desc = extData['desc']
-                    oll.push(t)
+                    // let t: ol = { type: '', name: '', lnglat: [0, 0], id: 0, desc: '' }
+                    // let extData = overlay.getExtData();
+                    // t.type = extData['type']
+                    // t.name = extData['name']
+                    // t.lnglat = extData['lnglat']
+                    // t.id = extData['id']
+                    // t.desc = extData['desc']
+                    oll.push(overlay.getExtData())
                 })
                 emitUplist(oll)
             })
@@ -120,7 +120,7 @@ instance?.proxy?.$Bus.on('sr', (r) => {
 })
 
 instance?.proxy?.$Bus.on('fo', (lnglat) => {
-    map.setZoomAndCenter(19, lnglat, false)
+    map.setZoomAndCenter(18, [lnglat[0] - 0.002, lnglat[1]], false)
 })
 
 const emitUplist = (l: any) => {
@@ -150,5 +150,13 @@ initMap();
 .amap-copyright {
     display: none;
     opacity: 0;
+}
+.amap-info-content {
+    position: relative;
+    background: #fff;
+    padding: 0px 0px 0px 0px;
+    line-height: 1.4;
+    overflow: hidden;
+    border-radius: 30px;
 }
 </style>

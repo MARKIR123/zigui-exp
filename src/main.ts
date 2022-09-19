@@ -4,11 +4,11 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import { createPinia } from 'pinia'
 import mitt from 'mitt'
+import { extData } from './utils/type'
 
-type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
 type Events = {
     ln: string,
-    udl: ol[],
+    udl: extData[],
     sfv: any,
     sr: string,
     fo: [number, number]

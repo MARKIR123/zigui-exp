@@ -7,13 +7,13 @@ function setLayer(layern: any, map: any) {
     }).then((AMap) => {
         if (layern == 'Google Satellite'){
             var layer = new AMap.TileLayer({
-                getTileUrl: `http://mt{1,2,3,0}.google.cn/vt/lyrs=s@142&hl=zh-CN&gl=cn&x=[x]&y=[y]&z=[z]&s=Galil`,
+                getTileUrl: `http://mt{1,2,3,0}.google.cn/vt/lyrs=y@142&hl=zh-CN&gl=cn&x=[x]&y=[y]&z=[z]&s=Galil`,
                 zIndex: 2
             });
         }
         else if (layern == 'Google Map'){
             var layer = new AMap.TileLayer({
-                getTileUrl: `http://mt{1,2,3,0}.google.cn/vt/lyrs=y@142&hl=zh-CN&gl=cn&x=[x]&y=[y]&z=[z]&s=Galil`,
+                getTileUrl: `http://mt{1,2,3,0}.google.cn/vt/lyrs=m@142&hl=zh-CN&gl=cn&x=[x]&y=[y]&z=[z]&s=Galil`,
                 zIndex: 2
             });
         }

@@ -60,7 +60,7 @@
             </div>
 
             <v-btn icon @click="print">
-              <v-icon>mdi-dots-vertical</v-icon>
+              <v-icon>mdi-printer</v-icon>
             </v-btn>
 
           </v-toolbar>
@@ -79,7 +79,7 @@
 
         <v-divider></v-divider>
         <v-expansion-panels focusable>
-          <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="emitFO(ol['lnglat'])">
+          <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="emitFO(ol)">
             <v-expansion-panel-title class="font-weight-thin">
               <v-icon v-if="ol.type == 'point'">
                 mdi-map-marker
@@ -123,6 +123,7 @@
 <script lang="ts">
 import { defineComponent, getCurrentInstance, reactive, ref } from 'vue'
 import Amap from './components/Amap.vue'
+import { extData } from './utils/type'
 
 export default defineComponent({
   name: 'App',
@@ -146,16 +147,15 @@ export default defineComponent({
         { title: '链子崖实习路线', value: 'lianziya' },
         { title: '屈原故里实习路线', value: 'quyuan' },
         { title: '泗溪公园实习路线', value: 'sixigongyuan' },
-        { title: '棺材岩实习路线', value: 'lianziya' },
+        { title: '棺材岩实习路线', value: 'guancaiyan' },
       ],
     }
   },
 
   setup() {
-    type ol = { type: string, name: string, lnglat: [number, number], id: number, desc?: string }
     const instance = getCurrentInstance();
     var currentRoute = ref('')
-    var Overlays: ol[] = reactive([])
+    var Overlays: extData[] = reactive([])
     const emitSL = (ln: string) => {
       instance?.proxy?.$Bus.emit('ln', ln)
     }
@@ -186,19 +186,25 @@ export default defineComponent({
       }
     }
 
-    const emitFO = (lnglat: [number, number]) => {
-      instance?.proxy?.$Bus.emit('fo', lnglat)
+    const emitFO = (ol: extData) => {
+      Overlays.forEach((each: extData) => {
+        each.onPassive()
+      })
+      instance?.proxy?.$Bus.emit('fo', ol['lnglat'])
+      ol['onActive']()
     }
 
     instance?.proxy?.$Bus.on('udl', (l) => {
       Overlays.splice(0)
       for (let data of l) {
+        console.log(data);
+
         Overlays.push(data)
       }
     })
 
-    const print = () => {
-      console.log(Overlays);
+    function focus(ol: extData) {
+      ol['onActive']()
     }
 
     return {
@@ -207,6 +213,7 @@ export default defineComponent({
       emitLS,
       emitFO,
       print,
+      focus,
       currentRoute,
       Overlays
     }

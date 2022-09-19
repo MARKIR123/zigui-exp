@@ -6,8 +6,12 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
+	plugins: [
 		vue(),
 		vuetify({ autoImport: true }),
-	]
+	],
+	server: {
+		//使用IP能访问
+		host: '0.0.0.0'
+	}
 })
