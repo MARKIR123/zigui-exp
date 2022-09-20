@@ -27,23 +27,6 @@
               </v-menu>
             </div>
 
-            <!-- <div class="text-center">
-          <v-menu :close-on-content-click="false">
-            <template v-slot:activator="{ isActive, props }">
-              <v-btn icon rounded v-bind="props">
-                <v-icon>mdi-menu</v-icon>
-              </v-btn>
-            </template>
-            <v-navigation-drawer>
-              <v-list>
-                <v-list-item v-for="n in 5" :key="n" link>
-                    <v-list-item-title>Item {{ n }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-navigation-drawer>
-          </v-menu>
-        </div> -->
-
             <div class="text-center">
               <v-menu offset-y>
                 <template v-slot:activator="{ isActive, props }">
@@ -108,14 +91,6 @@
         </v-expansion-panels>
 
       </v-navigation-drawer>
-      <!-- <v-card max-width="64">
-        <v-btn @click="del">
-          delete
-        </v-btn>
-        <v-btn @click="del">
-          edit
-        </v-btn>
-      </v-card> -->
     </v-main>
   </v-app>
 </template>

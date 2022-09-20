@@ -11,7 +11,7 @@ import drawSpots from "../utils/drawSpots"
 import drawRoute from "../utils/drawRoute"
 import setSource from "../utils/setSource";
 import fitView from "../utils/fitView";
-import { useStore } from "../index/overlayindex"
+import { useStore } from "../index/store"
 import { extData } from '../utils/type'
 
 var map: AMap.Map;
