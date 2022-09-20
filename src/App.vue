@@ -8,7 +8,7 @@
             <v-text-field hide-details prepend-icon="mdi-magnify" single-line width="128">
             </v-text-field>
 
-            <v-btn icon @click="emitFV">
+            <v-btn icon @click="">
               <v-icon>mdi-crosshairs-gps</v-icon>
             </v-btn>
 
@@ -20,7 +20,7 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item v-for="(item, index) in routes" :key="index" @click="emitLS(item.value)">
+                  <v-list-item v-for="(item, index) in routeItems" :key="index" @click="setRoute(item.value)">
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -35,14 +35,14 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item v-for="(item, index) in layeritems" :key="index" @click="emitSL(item.title)">
+                  <v-list-item v-for="(item, index) in layerItems" :key="index" @click="setLayer(item.title)">
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
             </div>
 
-            <v-btn icon @click="print">
+            <v-btn icon @click="">
               <v-icon>mdi-printer</v-icon>
             </v-btn>
 
@@ -62,9 +62,9 @@
 
         <v-divider></v-divider>
         <v-expansion-panels focusable>
-          <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="emitFO(ol)">
+          <v-expansion-panel v-for="(ol, i) in mapStore.Overlays.getOverlays" :key="i" @click="">
             <v-expansion-panel-title class="font-weight-thin">
-              <v-icon v-if="ol.type == 'point'">
+              <v-icon v-if="1">
                 mdi-map-marker
               </v-icon>
               <v-icon v-else-if="ol['type'] == 'polyline'">
@@ -95,105 +95,52 @@
   </v-app>
 </template>
 
-<script lang="ts">
-import { defineComponent, getCurrentInstance, reactive, ref } from 'vue'
+<script lang="ts" setup>
 import Amap from './components/Amap.vue'
-import { extData } from './utils/type'
+import { useStore } from './index/store';
+import { LoadOL } from './utils/LoadOl';
+import setSource from './utils/setSource';
+import { drawSpot } from './utils/drawSpots';
+import { drawRoute } from './utils/drawRoute';
 
-export default defineComponent({
-  name: 'App',
+const mapStore = useStore()
 
-  components: {
-    Amap,
-  },
+var layerItems = [
+  { title: 'Google Satellite' },
+  { title: 'Google Map' },
+  { title: 'Google Terrain' },
+  { title: 'Gaode Map' },
+  { title: 'Gaode Satellite' },
+]
+var routeItems = [
+  { title: '三峡大坝实习路线', value: 'sanxia' },
+  { title: '张家冲实习路线', value: 'zhangjiachong' },
+  { title: '链子崖实习路线', value: 'lianziya' },
+  { title: '屈原故里实习路线', value: 'quyuan' },
+  { title: '泗溪公园实习路线', value: 'sixigongyuan' },
+  { title: '棺材岩实习路线', value: 'guancaiyan' },
+]
+var currentRoute = ''
 
-  data() {
-    return {
-      layeritems: [
-        { title: 'Google Satellite' },
-        { title: 'Google Map' },
-        { title: 'Google Terrain' },
-        { title: 'Gaode Map' },
-        { title: 'Gaode Satellite' },
-      ],
-      routes: [
-        { title: '三峡大坝实习路线', value: 'sanxia' },
-        { title: '张家冲实习路线', value: 'zhangjiachong' },
-        { title: '链子崖实习路线', value: 'lianziya' },
-        { title: '屈原故里实习路线', value: 'quyuan' },
-        { title: '泗溪公园实习路线', value: 'sixigongyuan' },
-        { title: '棺材岩实习路线', value: 'guancaiyan' },
-      ],
+const setLayer = (layer: string) => {
+  setSource.setLayer(layer, mapStore.Map)
+}
+
+const setRoute = (route: string) => {
+  let Loaded: AMap.OverlayGroup = new AMap.OverlayGroup();
+  Loaded = LoadOL(route, mapStore.Overlays)
+  console.log(Loaded.getOverlays());
+  
+  Loaded.eachOverlay((ol: AMap.Marker | AMap.Polyline) => {
+    if (ol.className == 'AMap.Marker') {
+      drawSpot(ol, mapStore.Overlays, mapStore.Map, mapStore.Icon, mapStore.IconSelect)
     }
-  },
-
-  setup() {
-    const instance = getCurrentInstance();
-    var currentRoute = ref('')
-    var Overlays: extData[] = reactive([])
-    const emitSL = (ln: string) => {
-      instance?.proxy?.$Bus.emit('ln', ln)
+    else if (ol.className == 'Overlay.Polyline') {
+      drawRoute(ol as unknown as AMap.Polyline, mapStore.Overlays, mapStore.Map)
     }
-
-    const emitFV = () => {
-      instance?.proxy?.$Bus.emit('sfv')
-    }
-
-    const emitLS = (r: string) => {
-      instance?.proxy?.$Bus.emit('sr', r)
-      if (r == 'sanxia') {
-        currentRoute.value = '三峡实习路线';
-      }
-      else if (r == 'zhangjiachong') {
-        currentRoute.value = '张家冲实习路线';
-      }
-      else if (r == 'sixigongyuan') {
-        currentRoute.value = '泗溪公园实习路线';
-      }
-      else if (r == 'quyuan') {
-        currentRoute.value = '屈原故里实习路线';
-      }
-      else if (r == 'lianziya') {
-        currentRoute.value = '链子崖实习路线';
-      }
-      else if (r == 'guancaiyan') {
-        currentRoute.value = '花鸡坡-棺材岩实习路线';
-      }
-    }
-
-    const emitFO = (ol: extData) => {
-      Overlays.forEach((each: extData) => {
-        each.onPassive()
-      })
-      instance?.proxy?.$Bus.emit('fo', ol['lnglat'])
-      ol['onActive']()
-    }
-
-    instance?.proxy?.$Bus.on('udl', (l) => {
-      Overlays.splice(0)
-      for (let data of l) {
-        console.log(data);
-
-        Overlays.push(data)
-      }
-    })
-
-    function focus(ol: extData) {
-      ol['onActive']()
-    }
-
-    return {
-      emitSL,
-      emitFV,
-      emitLS,
-      emitFO,
-      print,
-      focus,
-      currentRoute,
-      Overlays
-    }
-  }
-})
+    mapStore.Map.setFitView(Loaded.getOverlays(), false, [50, 50, 50, 50])
+  })
+}
 </script>
 
 <style>

@@ -6,7 +6,9 @@ export const useStore = defineStore('olstore', {
         return {
           // 所有这些属性都将自动推断其类型
             Map: {} as AMap.Map,
-            Overlays: 
+            Overlays: {} as AMap.OverlayGroup,
+            Icon: {} as AMap.Icon,
+            IconSelect: {} as AMap.Icon
         }
       },
 })
