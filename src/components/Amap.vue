@@ -3,7 +3,6 @@
 </template>
   
 <script lang='ts' setup>
-import { reactive, onBeforeMount, onMounted } from 'vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
 import "@amap/amap-jsapi-types";
 import { getAssetsImages } from "../utils/getImage"
@@ -40,6 +39,9 @@ function initMap() {
                 viewMode: "3D", //是否为3D地图模式
                 terrain: true,
                 zooms: [2, 23],
+                pitch: 30,
+                jogEnable: true,
+                animateEnable: true,
                 zoom: 10, //初始化地图级别
                 center: [111.274722, 30.738333], //初始化地图中心点位置
                 layers: [
@@ -85,52 +87,10 @@ function initMap() {
                 // console.log(path)
             })
 
-            console.log('inAmap:', mapStore.Overlays);
-
         }).catch((e) => {
             console.error(e);  //加载错误提示
         });
 }
-
-// const instance = getCurrentInstance()
-// instance?.proxy?.$Bus.on('ln', (ln) => {
-//     setSource.setLayer(ln, map)
-// })
-
-// instance?.proxy?.$Bus.on('sfv', () => {
-//     fitView.fitView(map)
-// })
-
-// instance?.proxy?.$Bus.on('sr', (r) => {
-//     map.clearMap();
-//     //console.log(Overlays.getOverlays());
-//     Overlays.clearOverlays();
-//     drawSpots.drawSpots(r, map, Overlays, Sicon, Siconselect)
-//     drawRoute.drawRoute(r, map, Overlays)
-// })
-
-// instance?.proxy?.$Bus.on('fo', (lnglat) => {
-//     map.setZoomAndCenter(18, [lnglat[0] - 0.002, lnglat[1]], false)
-// })
-
-// const emitUplist = (l: any) => {
-//     instance?.proxy?.$Bus.emit('udl', l)
-// }
-
-
-console.log("Amap setup");
-console.log(mapStore.Overlays.CLASS_NAME);
-
-onBeforeMount(() => {
-    console.log("Amap onBeforeMount");
-    console.log(mapStore.Overlays.CLASS_NAME);
-
-})
-
-onMounted(() => {
-    console.log("Amap onMounted");
-    console.log(mapStore.Overlays.CLASS_NAME);
-})
 
 initMap();
 </script>

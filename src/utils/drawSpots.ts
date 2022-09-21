@@ -20,7 +20,7 @@ function drawSpot(marker: AMap.Marker, overlays: AMap.OverlayGroup, map:AMap.Map
             infoWindow.setContent(
                 `<div style="overflow: visible; width: 600px;height:min-content;background-color:#FFFFFF; border-radius: 30px;padding: 6px 0px 6px 0px;">
                     <p style="padding-left: 2rem;font-size: 32px;font-family: 'Microsoft JhengHei'">${sspot_}</p>
-                    <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei';color: #424242">By  ${author_} ${sdate_}</p>
+                    <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei';color: #424242">By  ${author_}    ${sdate_}</p>
                     <div>
                         <img src=${url_} style="margin-left: -6px;margin-right: -6px;"  width="612"/>
                     </div>
@@ -47,7 +47,7 @@ function drawSpot(marker: AMap.Marker, overlays: AMap.OverlayGroup, map:AMap.Map
         }
 
         marker.getExtData().onFocus = (zoom: number) => {
-            map.setZoomAndCenter(zoom, [(marker.getExtData().lnglat as [number, number])[0] - 0.002, (marker.getExtData().lnglat as [number, number])[1]])
+            map.setZoomAndCenter(zoom, [(marker.getExtData().lnglat as [number, number])[0] - 0.002, (marker.getExtData().lnglat as [number, number])[1]], false)
         }
 
         marker.on('mouseover', function () {
