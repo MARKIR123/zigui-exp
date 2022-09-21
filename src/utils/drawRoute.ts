@@ -51,14 +51,14 @@ function drawRoute(polyline: AMap.Polyline, overlays: AMap.OverlayGroup, map: AM
             overlays.removeOverlay(polyline)
         }
 
-        polyline.getExtData().onAcive = () => {
+        polyline.getExtData().onActive = () => {
             polyline.setOptions({
                 isOutline: true,
                 borderWeight: 3,
                 outlineColor: '#FFFFFF',
                 strokeOpacity: 0.8
             })
-            text.setPosition((polyline.getExtData().path as Array<[number, number]>)[0])
+            text.setPosition(polyline.getExtData().lnglat)
             text.show()
         }
 
@@ -70,7 +70,7 @@ function drawRoute(polyline: AMap.Polyline, overlays: AMap.OverlayGroup, map: AM
         }
 
         polyline.getExtData().onFocus = (zoom: number) => {
-            map.setZoomAndCenter(zoom, (polyline.getExtData().path as Array<[number, number]>)[0])
+            map.setZoomAndCenter(zoom, polyline.getExtData().lnglat)
         }
 
         map.add(polyline)

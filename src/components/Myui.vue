@@ -39,7 +39,7 @@
                     </v-menu>
                 </div>
 
-                <v-btn icon @click="test_over()">
+                <v-btn icon @click="print">
                     <v-icon>mdi-printer</v-icon>
                 </v-btn>
 
@@ -64,7 +64,7 @@
                     <v-icon v-if="ol.getExtData().type == 'point'">
                         mdi-map-marker
                     </v-icon>
-                    <v-icon v-else-if="ol.getExtData() == 'polyline'">
+                    <v-icon v-else-if="ol.getExtData().type == 'polyline'">
                         mdi-vector-polyline
                     </v-icon>
                     <v-list-item-title>
@@ -167,32 +167,52 @@ onMounted(() => {
 
 <style>
 .v-toolbar {
-    margin-top: 12px;
-    margin-right: 12px;
+  margin-top: 12px;
+  margin-right: 12px;
 }
 
 .v-expansion-panel-title {
-    padding: 16px 8px !important
+  padding: 16px 8px !important
 }
 
 .v-icon.mdi-earth {
-    --v-icon-size-multiplier: 1.6;
+  --v-icon-size-multiplier: 1.6;
 }
 
 .v-navigation-drawer__content {
-    overflow-y: auto !important;
+  overflow-y: auto !important;
 }
 
 .v-expansion-panel {
-    flex: 1 0 100%;
-    /* max-width: 100%; */
-    position: relative;
-    transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
-    transition-property: margin-top, border-radius, border, max-width;
-    border-radius: 4px;
+  flex: 1 0 100%;
+  /* max-width: 100%; */
+  position: relative;
+  transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: margin-top, border-radius, border, max-width;
+  border-radius: 4px;
+}
+
+.v-expansion-panel .v-expansion-panel-title #text {
+  overflow: hidden !important;
 }
 
 .v-icon {
-    color: #616161;
+  color: #616161;
 }
+
+.v-input {
+  display: grid;
+  flex: 1 1 auto;
+  font-size: 1rem;
+  font-weight: 300 !important;
+  line-height: 2.4 !important;
+  width: 180px;
+}
+
+.v-input__prepend {
+  display: flex;
+  padding-top: 36px !important;
+  padding-left: 12px;
+}
+
 </style>

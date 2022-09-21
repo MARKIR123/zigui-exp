@@ -68,28 +68,6 @@ function initMap() {
                 IconSelect: IconSelect
             }
 
-            console.log('Overlays in amap:', mapStore.Overlays);
-            console.log('map in amap:', mapStore.Map);
-            console.log('icon in amap:', mapStore.Icon);
-            console.log('icons in amap:', mapStore.IconSelect);
-
-            // mapStore.$patch((state) => {
-            //     state.Map = Map
-
-            //     state.Overlays = Overlays
-
-            //     state.Icon = new AMap.Icon({
-            //         size: new AMap.Size(40, 50),
-            //         image: getAssetsImages('locate.png'),
-            //         imageSize: new AMap.Size(40, 50)
-            //     });
-            //     state.IconSelect = new AMap.Icon({
-            //         size: new AMap.Size(40, 50),
-            //         image: getAssetsImages('locate-select.png'),
-            //         imageSize: new AMap.Size(40, 50)
-            //     });
-            // })
-
             //添加插件
             AMap.plugin(["AMap.Scale"], function () {
                 //异步同时加载多个插件
@@ -108,22 +86,6 @@ function initMap() {
             })
 
             console.log('inAmap:', mapStore.Overlays);
-
-
-            // watch(Overlays, (newv, oldv) => {
-            //     let oll: extData[] = [];
-            //     newv.eachOverlay((overlay: AMap.Polyline | AMap.Marker, index: number, collections: any) => {
-            //         // let t: ol = { type: '', name: '', lnglat: [0, 0], id: 0, desc: '' }
-            //         // let extData = overlay.getExtData();
-            //         // t.type = extData['type']
-            //         // t.name = extData['name']
-            //         // t.lnglat = extData['lnglat']
-            //         // t.id = extData['id']
-            //         // t.desc = extData['desc']
-            //         oll.push(overlay.getExtData())
-            //     })
-            //     emitUplist(oll)
-            // })
 
         }).catch((e) => {
             console.error(e);  //加载错误提示
