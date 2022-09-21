@@ -2,7 +2,7 @@
     <v-row style="height: px;">
         <v-col class="d-flex justify-end">
             <v-toolbar dense floating height="48" rounded="lg">
-                <v-text-field hide-details prepend-icon="mdi-magnify" single-line width="128">
+                <v-text-field prepend-icon="mdi-magnify" width="128">
                 </v-text-field>
 
                 <v-btn icon @click="">
@@ -180,7 +180,7 @@ onMounted(() => {
 }
 
 .v-navigation-drawer__content {
-    overflow-y: hidden !important;
+    overflow-y: auto !important;
 }
 
 .v-expansion-panel {
@@ -190,10 +190,6 @@ onMounted(() => {
     transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
     transition-property: margin-top, border-radius, border, max-width;
     border-radius: 4px;
-}
-
-.v-expansion-panel .v-expansion-panel-title #text {
-    overflow: auto !important;
 }
 
 .v-icon {
