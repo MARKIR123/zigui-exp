@@ -27,12 +27,14 @@
                             </v-list-item-action> -->
 
                     </template>
-
                 </v-autocomplete>
 
-
-                <v-btn icon @click="">
+                <v-btn icon @click="emitCP()">
                     <v-icon>mdi-crosshairs-gps</v-icon>
+                </v-btn>
+
+                <v-btn icon @click="globalView()">
+                    <v-icon>mdi-overscan</v-icon>
                 </v-btn>
 
                 <div class="text-center">
@@ -117,6 +119,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getCurrentInstance } from 'vue';
 import { useStore } from '../index/store';
 import { LoadOL } from '../utils/LoadOl';
 import setSource from '../utils/setSource';
@@ -148,7 +151,16 @@ var currentObj: extData;
 
 var search = ref('');
 
-var maxSelect = 6;
+const instance = getCurrentInstance()
+
+const emitCP = () => {
+    instance?.proxy?.$Bus.emit("GetCP")
+    console.log('请求当前位置:');
+}
+
+const globalView = () => {
+    mapStore.Map.setFitView(mapStore.Overlays.getOverlays(), false, [20, 20, 10, 10])
+}
 
 const searchFilter = (item: { name: string, value: string }, queryText: string, itemText: string) => {
     const textOne = item.name

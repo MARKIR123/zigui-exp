@@ -7,11 +7,7 @@ import mitt from 'mitt'
 import { extData } from './utils/type'
 
 type Events = {
-    ln: string,
-    udl: extData[],
-    sfv: any,
-    sr: string,
-    fo: [number, number]
+  'GetCP': void,
 }
 
 const Mit = mitt<Events>()

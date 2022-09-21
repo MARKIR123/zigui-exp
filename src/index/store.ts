@@ -10,7 +10,8 @@ export const useStore = defineStore('olstore', {
       Map: {} as AMap.Map,
       Overlays: {} as AMap.OverlayGroup,
       Icon: {} as AMap.Icon,
-      IconSelect: {} as AMap.Icon
+      IconSelect: {} as AMap.Icon,
+      CurrentPos: [0, 0]
     }
   },
   getters: {
