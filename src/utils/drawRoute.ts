@@ -1,5 +1,4 @@
 import AMapLoader from "@amap/amap-jsapi-loader";
-import { extData } from "./type";
 
 function drawRoute(polyline: AMap.Polyline, overlays: AMap.OverlayGroup, map: AMap.Map) {
     AMapLoader.load({
@@ -10,7 +9,7 @@ function drawRoute(polyline: AMap.Polyline, overlays: AMap.OverlayGroup, map: AM
 
         let text = new AMap.Text({
             map: map,
-            text: polyline.getExtData.name,
+            text: polyline.getExtData().name,
             offset: [3, -3],
             style: {
                 'padding': '.5rem .5rem',

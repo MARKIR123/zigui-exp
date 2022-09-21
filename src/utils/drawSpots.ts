@@ -1,6 +1,5 @@
 import "@amap/amap-jsapi-types";
 import AMapLoader from "@amap/amap-jsapi-loader";
-import { extData } from "./type";
 
 function drawSpot(marker: AMap.Marker, overlays: AMap.OverlayGroup, map:AMap.Map, icon: AMap.Icon, iconselect: AMap.Icon) {
     AMapLoader.load({
@@ -47,8 +46,8 @@ function drawSpot(marker: AMap.Marker, overlays: AMap.OverlayGroup, map:AMap.Map
             infoWindow.close(map)
         }
 
-        marker.getExtData().focusOn = (zoom: number) => {
-            map.setZoomAndCenter(zoom, marker.getExtData().lnglat as [number, number])
+        marker.getExtData().onFocus = (zoom: number) => {
+            map.setZoomAndCenter(zoom, [(marker.getExtData().lnglat as [number, number])[0] - 0.002, (marker.getExtData().lnglat as [number, number])[1]])
         }
 
         marker.on('mouseover', function () {

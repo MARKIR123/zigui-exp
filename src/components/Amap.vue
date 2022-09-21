@@ -3,12 +3,21 @@
 </template>
   
 <script lang='ts' setup>
+import { reactive, onBeforeMount, onMounted } from 'vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
 import "@amap/amap-jsapi-types";
 import { getAssetsImages } from "../utils/getImage"
 import { useStore } from "../index/store"
 
 const mapStore = useStore()
+
+var Overlays: AMap.OverlayGroup;
+
+var Map: AMap.Map;
+
+var Icon: AMap.Icon;
+
+var IconSelect: AMap.Icon;
 
 //进行地图初始化
 function initMap() {
@@ -25,7 +34,8 @@ function initMap() {
                 getTileUrl: 'http://mt{1,2,3,0}.google.cn/vt/lyrs=y@142&hl=zh-CN&gl=cn&x=[x]&y=[y]&z=[z]&s=Galil',
                 zIndex: 2
             });
-            mapStore.Map = new AMap.Map("container", {
+
+            Map = new AMap.Map("container", {
                 //设置地图容器id
                 viewMode: "3D", //是否为3D地图模式
                 terrain: true,
@@ -36,27 +46,56 @@ function initMap() {
                     googleLayer,
                 ],
             });
+
+            Overlays = new AMap.OverlayGroup();
+
+            Icon = new AMap.Icon({
+                size: new AMap.Size(40, 50),
+                image: getAssetsImages('locate.png'),
+                imageSize: new AMap.Size(40, 50)
+            });
+
+            IconSelect = new AMap.Icon({
+                size: new AMap.Size(40, 50),
+                image: getAssetsImages('locate-select.png'),
+                imageSize: new AMap.Size(40, 50)
+            });
+
+            mapStore.$state = {
+                Map: Map,
+                Overlays: Overlays,
+                Icon: Icon,
+                IconSelect: IconSelect
+            }
+
+            console.log('Overlays in amap:', mapStore.Overlays);
+            console.log('map in amap:', mapStore.Map);
+            console.log('icon in amap:', mapStore.Icon);
+            console.log('icons in amap:', mapStore.IconSelect);
+
+            // mapStore.$patch((state) => {
+            //     state.Map = Map
+
+            //     state.Overlays = Overlays
+
+            //     state.Icon = new AMap.Icon({
+            //         size: new AMap.Size(40, 50),
+            //         image: getAssetsImages('locate.png'),
+            //         imageSize: new AMap.Size(40, 50)
+            //     });
+            //     state.IconSelect = new AMap.Icon({
+            //         size: new AMap.Size(40, 50),
+            //         image: getAssetsImages('locate-select.png'),
+            //         imageSize: new AMap.Size(40, 50)
+            //     });
+            // })
+
             //添加插件
             AMap.plugin(["AMap.Scale"], function () {
                 //异步同时加载多个插件
                 mapStore.Map.addControl(new AMap.Scale({
                     position: { right: '3px', bottom: '7px' }
                 })); //显示当前地图中心的比例尺
-            });
-
-            mapStore.Overlays = new AMap.OverlayGroup();
-
-            //创建spot icon
-            mapStore.Icon = new AMap.Icon({
-                size: new AMap.Size(40, 50),
-                image: getAssetsImages('locate.png'),
-                imageSize: new AMap.Size(40, 50)
-            });
-
-            mapStore.IconSelect = new AMap.Icon({
-                size: new AMap.Size(40, 50),
-                image: getAssetsImages('locate-select.png'),
-                imageSize: new AMap.Size(40, 50)
             });
 
             //var path: any[] = []
@@ -67,6 +106,9 @@ function initMap() {
                 // path.push([e.lnglat.lng, e.lnglat.lat])
                 // console.log(path)
             })
+
+            console.log('inAmap:', mapStore.Overlays);
+
 
             // watch(Overlays, (newv, oldv) => {
             //     let oll: extData[] = [];
@@ -112,6 +154,21 @@ function initMap() {
 // const emitUplist = (l: any) => {
 //     instance?.proxy?.$Bus.emit('udl', l)
 // }
+
+
+console.log("Amap setup");
+console.log(mapStore.Overlays.CLASS_NAME);
+
+onBeforeMount(() => {
+    console.log("Amap onBeforeMount");
+    console.log(mapStore.Overlays.CLASS_NAME);
+
+})
+
+onMounted(() => {
+    console.log("Amap onMounted");
+    console.log(mapStore.Overlays.CLASS_NAME);
+})
 
 initMap();
 </script>
