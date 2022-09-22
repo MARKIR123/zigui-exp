@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import "@amap/amap-jsapi-types";
-import { extData } from '../utils/type';
 
 export const useStore = defineStore('mapstore', {
   state: () => {

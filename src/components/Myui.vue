@@ -5,9 +5,9 @@
     <v-row>
         <v-col class="d-flex justify-end">
             <v-toolbar dense floating height="48" rounded="lg">
-                <v-autocomplete :items="olStore.Searchlist" :filter="searchFilter" v-model:search="search" color="blue"
+                <v-autocomplete :items="[]" :filter="searchFilter" v-model:search="search" color="blue"
                     item-title="name" item-value="value" prepend-icon="mdi-magnify" hide-no-data hide-details
-                    return-object v-on:keydown.enter="findOl(search)" hide-selected>
+                    return-object v-on:keydown.enter="" hide-selected>
                     <!-- <template v-slot:no-data>
                         <v-list-item>
                             <v-list-item-title>
@@ -45,8 +45,7 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item v-for="(item, index) in drawItems" :key="index"
-                                @click="">
+                            <v-list-item v-for="(item, index) in drawItems" :key="index" @click="">
                                 <v-list-item-title>{{ item.title }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
@@ -97,7 +96,8 @@
                         </template>
                         <v-list>
                             <v-list-item>
-                                <v-switch v-model="swtichTheme"  color="secondary" :label="theme.global.name.value"></v-switch>
+                                <v-switch v-model="swtichTheme" color="secondary" :label="theme.global.name.value">
+                                </v-switch>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -119,41 +119,72 @@
 
         <v-divider></v-divider>
         <v-expansion-panels focusable>
-            <v-expansion-panel v-for="(ol, i) in olStore.Overlayslist" :key="i" @click="focus(ol)">
-                <v-expansion-panel-title class="font-weight-thin">
-                    <v-icon v-if="ol.type == 'point'">
-                        mdi-map-marker
-                    </v-icon>
-                    <v-icon v-else-if="ol.type == 'polyline'">
-                        mdi-vector-polyline
-                    </v-icon>
-                    <v-list-item-title class="font-weight-thin">
-                        {{ol.name}}
-                    </v-list-item-title>
-                </v-expansion-panel-title>
+            <v-expansion-panel v-for="(ol, i) in olStore.Overlays" :key="i" @click="">
+                <v-expansion-panel-content v-if="ol.type == 'Spot'">
+                    <v-expansion-panel-title class="font-weight-thin">
+                        <v-icon>
+                            mdi-map-marker
+                        </v-icon>
+                        <v-list-item-title class="font-weight-thin">
+                            {{(ol as Spot).infowindow.name}}
+                        </v-list-item-title>
+                    </v-expansion-panel-title>
 
-                <v-expansion-panel-text>
-                    <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
-                        class="font-weight-thin" height="10">
-                        ID:
-                    </v-text-field>
-                    <v-text-field variant="underlined" :model-value="ol.name" v-on:keydown.enter="ol.onEdit(ol.name)" :disabled="!Editing" hide-details
-                        class="font-weight-thin">
-                        地点:
-                    </v-text-field>
-                    <v-text-field variant="underlined" :model-value="ol.lnglat" :disabled="true" hide-details
-                        class="font-weight-thin">
-                        坐标:
-                    </v-text-field>
+                    <v-expansion-panel-text>
+                        <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
+                            class="font-weight-thin" height="10">
+                            ID:
+                        </v-text-field>
+                        <v-text-field variant="underlined" :model-value="(ol as Spot).infowindow.name"
+                            v-on:keydown.enter="" :disabled="!Editing" hide-details class="font-weight-thin">
+                            地点:
+                        </v-text-field>
+                        <v-text-field variant="underlined" :model-value="(ol as Spot).lnglat" :disabled="true"
+                            hide-details class="font-weight-thin">
+                            坐标:
+                        </v-text-field>
 
-                    <v-textarea variant="underlined" :model-value="ol.desc" :disabled="!Editing" auto-grow
-                        class="font-weight-thin">
-                    </v-textarea>
+                        <v-textarea variant="underlined" :model-value="(ol as Spot).infowindow.desc"
+                            :disabled="!Editing" auto-grow class="font-weight-thin">
+                        </v-textarea>
 
-                    <v-container class="px-0" fluid>
-                        <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
-                    </v-container>
-                </v-expansion-panel-text>
+                        <v-container class="px-0" fluid>
+                            <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
+                        </v-container>
+                    </v-expansion-panel-text>
+
+
+                </v-expansion-panel-content>
+
+                <v-expansion-panel-content v-if="ol.type == 'Route'">
+                    <v-expansion-panel-title class="font-weight-thin">
+                        <v-icon>
+                            mdi-vector-polyline
+                        </v-icon>
+                        <v-list-item-title class="font-weight-thin">
+                            {{(ol as Route).name}}
+                        </v-list-item-title>
+                    </v-expansion-panel-title>
+
+                    <v-expansion-panel-text>
+                        <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
+                            class="font-weight-thin" height="10">
+                            ID:
+                        </v-text-field>
+                        <v-text-field variant="underlined" :model-value="(ol as Route).name" v-on:keydown.enter=""
+                            :disabled="!Editing" hide-details class="font-weight-thin">
+                            地点:
+                        </v-text-field>
+
+                        <v-textarea variant="underlined" :model-value="(ol as Route).name" :disabled="!Editing"
+                            auto-grow class="font-weight-thin">
+                        </v-textarea>
+
+                        <v-container class="px-0" fluid>
+                            <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
+                        </v-container>
+                    </v-expansion-panel-text>
+                </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
     </v-navigation-drawer>
@@ -163,11 +194,11 @@
 import { getCurrentInstance } from 'vue';
 import { useStore } from '../index/store';
 import { useOlStore } from '../index/Olstore';
-import { LoadOL } from '../utils/LoadOl';
+import { LoadSpots, LoadRoute } from '../utils/LoadOl';
 import setSource from '../utils/setSource';
 import { drawSpot } from '../utils/drawSpots';
 import { drawRoute } from '../utils/drawRoute';
-import { extData } from '../utils/type';
+import { Spot, Route } from '../utils/type';
 import { ref } from 'vue';
 import { useTheme } from 'vuetify/lib/framework.mjs';
 
@@ -200,7 +231,7 @@ var drawItems = [
 
 var currentRoute = ref('')
 
-var currentObj: extData;
+var currentObj: Spot | Route;
 
 var search = ref('');
 
@@ -216,7 +247,7 @@ const emitCP = () => {
 }
 
 const globalView = () => {
-    mapStore.Map.setFitView(olStore.Overlays.getOverlays(), false, [20, 20, 10, 10])
+    // mapStore.Map.setFitView(olStore.Overlays, false, [20, 20, 10, 10])
 }
 
 const searchFilter = (item: { name: string, value: string }, queryText: string, itemText: string) => {
@@ -237,46 +268,37 @@ const setRoute = (routeName: string, route: string, onloaded: boolean, index: nu
         //提示路线已被加载
     }
     else {
-        let Loaded: AMap.OverlayGroup = new AMap.OverlayGroup();
-        Loaded = LoadOL(route, olStore.Overlays)
-        Loaded.eachOverlay((ol: AMap.Marker | AMap.Polyline) => {
-            if (ol.className == 'AMap.Marker') {
-                drawSpot(ol, olStore.Overlays, mapStore.Map, olStore.Icon, olStore.IconSelect)
-            }
-            else if (ol.className == 'Overlay.Polyline') {
-                drawRoute(ol as unknown as AMap.Polyline, olStore.Overlays, mapStore.Map)
-            }
-            mapStore.Map.setFitView(Loaded.getOverlays(), false, [50, 50, 50, 50])
-        })
+        let Loaded: Array<Spot | Route> = [];
+        Loaded = [...LoadSpots(route, olStore.Overlays, olStore.Icon, olStore.IconSelect, mapStore.Map), LoadRoute(route, olStore.Overlays, olStore.Linestyle, olStore.Linestylesl, mapStore.Map)]
         currentRoute.value = routeName;
         routeItems[index].onloaded = true
     }
     //提示路线加载成功
 }
 
-const focus = (ol: extData) => {
-    if (currentObj == undefined) {
-        ol.onFocus(18)
-        ol.onActive()
-        currentObj = ol;
-    }
-    else {
-        currentObj.onPassive()
-        ol.onFocus(18)
-        ol.onActive()
-        currentObj = ol;
-    }
-}
+// const focus = (ol: extData) => {
+//     if (currentObj == undefined) {
+//         ol.onFocus(18)
+//         ol.onActive()
+//         currentObj = ol;
+//     }
+//     else {
+//         currentObj.onPassive()
+//         ol.onFocus(18)
+//         ol.onActive()
+//         currentObj = ol;
+//     }
+// }
 
-const findOl = (name: string): boolean => {
-    olStore.Overlayslist.forEach((ol) => {
-        if (ol.name == name) {
-            focus(ol)
-            return true;
-        }
-    })
-    return false;
-}
+// const findOl = (name: string): boolean => {
+//     olStore.Overlayslist.forEach((ol) => {
+//         if (ol.name == name) {
+//             focus(ol)
+//             return true;
+//         }
+//     })
+//     return false;
+// }
 
 const Edit = () => {
 

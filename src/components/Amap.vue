@@ -66,6 +66,17 @@ function initMap() {
                     imageSize: new AMap.Size(40, 50)
                 }),
 
+                Linestyle: new AMap.PolylineOptions({
+                    isOutline: true,
+                    borderWeight: 3,
+                    outlineColor: '#FFFFFF',
+                    strokeOpacity: 0.8
+                }),
+
+                Linestylesl: new AMap.PolylineOptionssetOptions({
+                    isOutline: false,
+                }),
+
                 CurrentPos: [0, 0]
             }
 

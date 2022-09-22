@@ -25,7 +25,6 @@ function drawRoute(polyline: AMap.Polyline, overlays: AMap.OverlayGroup, map: AM
                 'opacity': 0.8
             }
         })
-
         text.hide()
 
         polyline.on('mouseover', function (e: any) {

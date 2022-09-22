@@ -1,5 +1,6 @@
 import AMapLoader from "@amap/amap-jsapi-loader";
 import "@amap/amap-jsapi-types";
+import { setActivePinia } from "pinia";
 import { getAssetsImages } from './getImage'
 
 type extData = {
@@ -90,9 +91,10 @@ class InfoWindow {
     }
 }
 
-class Spot {
+export class Spot {
     marker: AMap.Marker = {} as AMap.Marker;
     id: number = 0;
+    type: string = 'Spot';
     lnglat: [number, number] = [0, 0];
     infowindow: InfoWindow = {} as InfoWindow;
     icon: AMap.Icon = {} as AMap.Icon;
@@ -153,8 +155,58 @@ class Spot {
     }
 }
 
-class Route {
+class Textmark {
 
 }
 
-export type { Spot, Route, InfoWindow, extData }
+export class Route {
+    id: number = 0;
+    type: string = 'Route';
+    name: string = '';
+    line: AMap.Polyline = {} as AMap.Polyline;
+    path: Array<[number, number]> = [];
+    desc: string = '';
+    style: AMap.PolylineOptions = {} as AMap.PolylineOptions;
+    astyle: AMap.PolylineOptions = {} as AMap.PolylineOptions;
+
+    constructor(id: number = 0, name: string = '', path: Array<[number, number]> = [], desc: string = '', style: AMap.PolylineOptions, astyle: AMap.PolylineOptions) {
+        var p = this
+        AMapLoader.load({
+            key: "222fee29d8f3e925028190154bfb717d", // 申请好的Web端开发者Key，首次调用 load 时必填
+            version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+            Loca: {                // 是否加载 Loca， 缺省不加载
+                "version": '2.0.0',  // Loca 版本，缺省 1.3.2
+            },
+        }).then((AMap) => {
+            p.id = id;
+            p.name = name;
+            p.desc = desc;
+            p.style = style;
+            p.astyle = astyle;
+            p.line = new AMap.polyline({
+                path: path,            // 设置线覆盖物路径
+                // showDir: true,
+                // strokeColor: '#3366bb',   // 线颜色
+                // strokeWeight: 10,          // 线宽
+                // lineJoin: 'round',
+                // lineCap: 'round',
+            })
+            p.line.setOptions(style);
+        })
+    }
+
+    //设置Route样式
+    setStyle(style: AMap.PolylineOptions = this.style) {
+        this.line.setOptions(style);
+    }
+
+    //Active
+    setActive() {
+        this.setStyle(this.astyle);
+    }
+
+    //Normal
+    setNormal() {
+        this.setStyle();
+    }
+}
