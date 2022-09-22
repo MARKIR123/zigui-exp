@@ -4,8 +4,8 @@
     </div>
     <v-row>
         <v-col class="d-flex justify-end">
-            <v-toolbar dense floating height="45" rounded="lg">
-                <v-autocomplete :items="mapStore.Searchlist" :filter="searchFilter" v-model:search="search" color="blue"
+            <v-toolbar dense floating height="48" rounded="lg">
+                <v-autocomplete :items="olStore.Searchlist" :filter="searchFilter" v-model:search="search" color="blue"
                     item-title="name" item-value="value" prepend-icon="mdi-magnify" hide-no-data hide-details
                     return-object v-on:keydown.enter="findOl(search)" hide-selected>
                     <!-- <template v-slot:no-data>
@@ -41,6 +41,22 @@
                     <v-menu offset-y>
                         <template v-slot:activator="{ isActive, props }">
                             <v-btn icon rounded v-bind="props">
+                                <v-icon>mdi-pencil-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item v-for="(item, index) in drawItems" :key="index"
+                                @click="">
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+
+                <div class="text-center">
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ isActive, props }">
+                            <v-btn icon rounded v-bind="props">
                                 <v-icon>mdi-map-marker-path</v-icon>
                             </v-btn>
                         </template>
@@ -68,9 +84,24 @@
                     </v-menu>
                 </div>
 
-                <v-btn icon @click="test_over()">
+                <v-btn icon @click="changeTheme()">
                     <v-icon>mdi-printer</v-icon>
                 </v-btn>
+
+                <div class="text-center">
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ isActive, props }">
+                            <v-btn icon rounded v-bind="props">
+                                <v-icon>mdi-dots-horizontal</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item>
+                                <v-switch v-model="swtichTheme"  color="secondary" :label="theme.global.name.value"></v-switch>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
 
             </v-toolbar>
         </v-col>
@@ -88,7 +119,7 @@
 
         <v-divider></v-divider>
         <v-expansion-panels focusable>
-            <v-expansion-panel v-for="(ol, i) in mapStore.Overlayslist" :key="i" @click="focus(ol)">
+            <v-expansion-panel v-for="(ol, i) in olStore.Overlayslist" :key="i" @click="focus(ol)">
                 <v-expansion-panel-title class="font-weight-thin">
                     <v-icon v-if="ol.type == 'point'">
                         mdi-map-marker
@@ -96,22 +127,32 @@
                     <v-icon v-else-if="ol.type == 'polyline'">
                         mdi-vector-polyline
                     </v-icon>
-                    <v-list-item-title>
+                    <v-list-item-title class="font-weight-thin">
                         {{ol.name}}
                     </v-list-item-title>
-
                 </v-expansion-panel-title>
-                <v-expansion-panel-text class="font-weight-thin">
-                    ID:{{ol.id}}
-                </v-expansion-panel-text>
-                <v-expansion-panel-text class="font-weight-thin">
-                    地点:{{ol.name}}
-                </v-expansion-panel-text>
-                <v-expansion-panel-text class="font-weight-thin">
-                    坐标:{{ol.lnglat}}
-                </v-expansion-panel-text>
-                <v-expansion-panel-text class="font-weight-thin">
-                    描述:{{ol.desc}}
+
+                <v-expansion-panel-text>
+                    <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
+                        class="font-weight-thin" height="10">
+                        ID:
+                    </v-text-field>
+                    <v-text-field variant="underlined" :model-value="ol.name" v-on:keydown.enter="ol.onEdit(ol.name)" :disabled="!Editing" hide-details
+                        class="font-weight-thin">
+                        地点:
+                    </v-text-field>
+                    <v-text-field variant="underlined" :model-value="ol.lnglat" :disabled="true" hide-details
+                        class="font-weight-thin">
+                        坐标:
+                    </v-text-field>
+
+                    <v-textarea variant="underlined" :model-value="ol.desc" :disabled="!Editing" auto-grow
+                        class="font-weight-thin">
+                    </v-textarea>
+
+                    <v-container class="px-0" fluid>
+                        <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
+                    </v-container>
                 </v-expansion-panel-text>
             </v-expansion-panel>
         </v-expansion-panels>
@@ -121,14 +162,20 @@
 <script lang="ts" setup>
 import { getCurrentInstance } from 'vue';
 import { useStore } from '../index/store';
+import { useOlStore } from '../index/Olstore';
 import { LoadOL } from '../utils/LoadOl';
 import setSource from '../utils/setSource';
 import { drawSpot } from '../utils/drawSpots';
 import { drawRoute } from '../utils/drawRoute';
 import { extData } from '../utils/type';
 import { ref } from 'vue';
+import { useTheme } from 'vuetify/lib/framework.mjs';
 
 const mapStore = useStore()
+
+const olStore = useOlStore()
+
+const theme = useTheme()
 
 var layerItems = [
     { title: 'Google Satellite' },
@@ -145,11 +192,21 @@ var routeItems = [
     { title: '泗溪公园实习路线', value: 'sixigongyuan', onloaded: false },
     { title: '棺材岩实习路线', value: 'guancaiyan', onloaded: false },
 ]
+
+var drawItems = [
+    { title: 'Draw Spot' },
+    { title: 'Draw Route' }
+]
+
 var currentRoute = ref('')
 
 var currentObj: extData;
 
 var search = ref('');
+
+var Editing = ref(false);
+
+var swtichTheme = ref(false);
 
 const instance = getCurrentInstance()
 
@@ -159,7 +216,7 @@ const emitCP = () => {
 }
 
 const globalView = () => {
-    mapStore.Map.setFitView(mapStore.Overlays.getOverlays(), false, [20, 20, 10, 10])
+    mapStore.Map.setFitView(olStore.Overlays.getOverlays(), false, [20, 20, 10, 10])
 }
 
 const searchFilter = (item: { name: string, value: string }, queryText: string, itemText: string) => {
@@ -181,13 +238,13 @@ const setRoute = (routeName: string, route: string, onloaded: boolean, index: nu
     }
     else {
         let Loaded: AMap.OverlayGroup = new AMap.OverlayGroup();
-        Loaded = LoadOL(route, mapStore.Overlays)
+        Loaded = LoadOL(route, olStore.Overlays)
         Loaded.eachOverlay((ol: AMap.Marker | AMap.Polyline) => {
             if (ol.className == 'AMap.Marker') {
-                drawSpot(ol, mapStore.Overlays, mapStore.Map, mapStore.Icon, mapStore.IconSelect)
+                drawSpot(ol, olStore.Overlays, mapStore.Map, olStore.Icon, olStore.IconSelect)
             }
             else if (ol.className == 'Overlay.Polyline') {
-                drawRoute(ol as unknown as AMap.Polyline, mapStore.Overlays, mapStore.Map)
+                drawRoute(ol as unknown as AMap.Polyline, olStore.Overlays, mapStore.Map)
             }
             mapStore.Map.setFitView(Loaded.getOverlays(), false, [50, 50, 50, 50])
         })
@@ -212,7 +269,7 @@ const focus = (ol: extData) => {
 }
 
 const findOl = (name: string): boolean => {
-    mapStore.Overlayslist.forEach((ol) => {
+    olStore.Overlayslist.forEach((ol) => {
         if (ol.name == name) {
             focus(ol)
             return true;
@@ -221,8 +278,16 @@ const findOl = (name: string): boolean => {
     return false;
 }
 
-const test_over = () => {
-    console.log(mapStore.Searchlist);
+const Edit = () => {
+
+}
+
+const changeTheme = () => {
+    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+}
+
+const test_over = (s: string) => {
+    console.log(s);
 }
 
 </script>
@@ -239,6 +304,10 @@ const test_over = () => {
 
 .v-icon.mdi-earth {
     --v-icon-size-multiplier: 1.6;
+}
+
+.v-icon {
+    color: #616161;
 }
 
 .v-navigation-drawer__content {
@@ -258,63 +327,51 @@ const test_over = () => {
     overflow: hidden !important;
 }
 
-.v-toolbar .v-icon {
+.v-toolbar.v-icon {
     color: #616161;
 }
 
-.v-input {
+.v-toolbar .v-input {
     font-weight: 300 !important;
     min-width: 240px;
 }
 
-.v-input__control {
+.v-icon.mdi-magnify {
+    margin-inline-start: 8px;
+}
+
+.v-toolbar .v-input__prepend {
+    margin-inline-end: 6px !important;
+}
+
+.v-toolbar .v-input__prepend,
+.v-input__append {
     display: flex;
-    grid-area: control;
-    height: 46px;
+    padding-top: 13px;
 }
 
-.v-input--horizontal .v-input__prepend {
-    margin-inline-end: 8px !important;
-    margin-inline-start: 8px !important;
-    padding-top: 12px !important;
-}
-
-.v-input--density-default {
-    --v-input-control-height: 56px;
-    --v-input-padding-top: 0px !important;
-}
-
-.v-field {
-    display: grid;
-    grid-template-areas: "prepend-inner field clear append-inner";
-    grid-template-columns: min-content minmax(0, 1fr) min-content min-content;
-    font-size: 16px;
-    letter-spacing: 0.009375em;
-    max-width: 100%;
-    border-radius: 4px;
-    contain: layout;
-    flex: 1 0;
-    grid-area: control;
-    position: relative;
-    --v-field-padding-start: 16px;
-    --v-field-padding-end: 16px;
-    --v-field-padding-top: 12px !important;
+.v-toolbar .v-input--density-default .v-field--variant-solo,
+.v-input--density-default .v-field--variant-filled {
+    --v-input-control-height: 48px !important;
     --v-field-padding-bottom: 6px;
 }
 
-.v-field-input {
-    padding-top: 12px !important;
+.v-toolbar .v-field__input {
+    padding-inline-start: 16px;
+    min-height: var(--v-input-control-height, 56px);
+    padding-inline-start: var(--v-field-padding-start);
+    padding-inline-end: var(--v-field-padding-end);
+    padding-top: 14px;
+    padding-bottom: var(--v-field-padding-bottom, 6px);
+    width: 100%;
 }
 
-.v-field__prepend-inner,
+.v-toolbar .v-field__prepend-inner,
 .v-field__append-inner,
 .v-field__clearable {
-    padding-top: 12px !important;
-}
-
-.v-input--density-default .v-field--variant-solo,
-.v-input--density-default .v-field--variant-filled {
-    --v-input-control-height: 45px !important;
+    align-items: flex-start;
+    display: flex;
+    padding-top: 14px !important;
 }
 
 .v-alert {
@@ -332,5 +389,9 @@ const test_over = () => {
 
 .selectbox {
     max-width: 400px;
+}
+
+.v-theme--light {
+    --v-disabled-opacity: 0.95 !important;
 }
 </style>

@@ -4,7 +4,6 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import { createPinia } from 'pinia'
 import mitt from 'mitt'
-import { extData } from './utils/type'
 
 type Events = {
   'GetCP': void,

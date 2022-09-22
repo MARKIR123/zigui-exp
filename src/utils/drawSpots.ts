@@ -50,6 +50,12 @@ function drawSpot(marker: AMap.Marker, overlays: AMap.OverlayGroup, map:AMap.Map
             map.setZoomAndCenter(zoom, [(marker.getExtData().lnglat as [number, number])[0] - 0.002, (marker.getExtData().lnglat as [number, number])[1]], false)
         }
 
+        marker.getExtData().onEdit = (name: string) => {
+            console.log('editName');
+            
+            marker.getExtData().name = name
+        }
+
         marker.on('mouseover', function () {
             marker.getExtData().onActive()
         })

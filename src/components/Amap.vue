@@ -7,9 +7,12 @@ import AMapLoader from "@amap/amap-jsapi-loader";
 import "@amap/amap-jsapi-types";
 import { getAssetsImages } from "../utils/getImage"
 import { useStore } from "../index/store"
+import { useOlStore } from "../index/Olstore";
 import { getCurrentInstance } from "vue";
 
 const mapStore = useStore()
+
+const Olstore = useOlStore()
 
 var geolocation: any;
 
@@ -46,7 +49,9 @@ function initMap() {
                         googleLayer,
                     ],
                 }),
+            }
 
+            Olstore.$state = {
                 Overlays: new AMap.OverlayGroup(),
 
                 Icon: new AMap.Icon({
@@ -63,6 +68,7 @@ function initMap() {
 
                 CurrentPos: [0, 0]
             }
+
 
             //添加插件
             AMap.plugin(["AMap.Scale", "AMap.Geolocation"], function () {
@@ -95,8 +101,8 @@ function initMap() {
                 function onComplete(data: any) {
                     // data是具体的定位信息
                     console.log('当前位置:', data.position);
-                    mapStore.CurrentPos = [data.position.lng, data.position.lat]
-                    mapStore.Map.setZoomAndCenter(19, mapStore.CurrentPos, false)
+                    Olstore.CurrentPos = [data.position.lng, data.position.lat]
+                    mapStore.Map.setZoomAndCenter(19, Olstore.CurrentPos as [number, number], false)
                 }
 
                 function onError(data: any) {
