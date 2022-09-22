@@ -19,12 +19,25 @@ type extData = {
     onEdit: (name: string) => void
 }
 
+class Photo {
+    img: string = '';
+    author: string = '';
+    date: string = '';
+    constructor(img: string, author: string, date: string) {
+        this.img = getAssetsImages(img);
+        this.author = author;
+        this.date = date;
+    }
+
+    setPhoto(img: string) {
+        this.img = getAssetsImages(img)
+    }
+}
+
 class InfoWindow {
     window: AMap.InfoWindow = {} as AMap.InfoWindow;
     name: string = '';
-    img: string = '';
-    date: string = '';
-    author: string = '';
+    photo: Photo = {} as Photo;
     desc: string = '';
 
     constructor(name: string = '', img: string = '', date: string = '', author: string = '', desc: string = '') {
@@ -43,9 +56,7 @@ class InfoWindow {
             });
             w.window.setContent();
             w.name = name;
-            w.img = getAssetsImages(img);
-            w.date = date;
-            w.author = author;
+            w.photo = new Photo(img, date, author)
             w.desc = desc;
         })
     }
@@ -56,7 +67,7 @@ class InfoWindow {
     }
 
     //设置InfoWindow内容
-    setContent(name: string = this.name, img: string = this.img, date: string = this.date, author: string = this.author, desc: string = this.desc) {
+    setContent(name: string = this.name, img: string = this.photo.img, date: string = this.photo.date, author: string = this.photo.author, desc: string = this.desc) {
         this.window.setContent((
             `<div style="overflow: visible; width: 600px;height:min-content;background-color:#FFFFFF; border-radius: 30px;padding: 6px 0px 6px 0px;">
                 <p style="padding-left: 2rem;font-size: 32px;font-family: 'Microsoft JhengHei'">${name}</p>
@@ -82,14 +93,13 @@ class InfoWindow {
 class Spot {
     marker: AMap.Marker = {} as AMap.Marker;
     id: number = 0;
-    name: string = '';
-    img: string = '';
-    date: string = '';
-    author: string = '';
-    desc: string = '';
+    lnglat: [number, number] = [0, 0];
+    infowindow: InfoWindow = {} as InfoWindow;
+    icon: AMap.Icon = {} as AMap.Icon;
+    iconSelect: AMap.Icon = {} as AMap.Icon;
 
-    constructor(id: number = 0, name: string = '', img: string = '', date: string = '', author: string = '', desc: string = '', icon: AMap.Icon, iconselect: AMap.Icon) {
-        var w = this
+    constructor(id: number = 0, name: string = '', lnglat: [number, number] = [0, 0], img: string = '', date: string = '', author: string = '', desc: string = '', icon: AMap.Icon, iconselect: AMap.Icon) {
+        var s = this
         AMapLoader.load({
             key: "222fee29d8f3e925028190154bfb717d", // 申请好的Web端开发者Key，首次调用 load 时必填
             version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
@@ -97,18 +107,49 @@ class Spot {
                 "version": '2.0.0',  // Loca 版本，缺省 1.3.2
             },
         }).then((AMap) => {
-            w.marker = new AMap.InfoWindow({
-                anchor: 'middle-right',
-                autoMove: false,
-                closeWhenClickMap: true
-            });
-            w.id = id;
-            w.name = name;
-            w.img = getAssetsImages(img);
-            w.date = date;
-            w.author = author;
-            w.desc = desc;
+            s.marker = new AMap.Marker({
+                icon: icon, // 自定义点标记
+                position: lnglat, // 基点位置
+                anchor: 'bottom-left', // 设置锚点方位
+            })
+            s.id = id;
+            s.lnglat = lnglat;
+            s.infowindow = new InfoWindow(name, img, date, author, desc)
+            s.icon = icon;
+            s.iconSelect = iconselect;
         })
+    }
+
+    //设置Marker Icon
+    setIcon(icon: AMap.Icon = this.icon) {
+        this.marker.setIcon(icon)
+    }
+
+    //Active
+    setActive(map: AMap.Map) {
+        this.setIcon(this.iconSelect);
+        this.infowindow.open(map, this.lnglat)
+    }
+
+    //Normal
+    setNormal() {
+        this.setIcon(this.icon);
+        this.infowindow.close()
+    }
+
+    //设定位置
+    setPosition(pos: [number, number]) {
+        this.lnglat = pos;
+        this.marker.setPosition(pos);
+    }
+
+    //聚焦
+    focus(map: AMap.Map, zoom: number) {
+        map.setZoomAndCenter(zoom, this.lnglat, false)
+    }
+
+    delete() {
+        this.marker.remove();
     }
 }
 
@@ -116,4 +157,4 @@ class Route {
 
 }
 
-export type { Spot, Route, InfoWindow }
+export type { Spot, Route, InfoWindow, extData }
