@@ -83,7 +83,7 @@
                     </v-menu>
                 </div>
 
-                <v-btn icon @click="changeTheme()">
+                <v-btn icon @click="test_over()">
                     <v-icon>mdi-printer</v-icon>
                 </v-btn>
 
@@ -308,8 +308,9 @@ const changeTheme = () => {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
-const test_over = (s: string) => {
-    console.log(s);
+const test_over = () => {
+    console.log(olStore.Overlays);
+    
 }
 
 </script>

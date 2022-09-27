@@ -7,7 +7,8 @@ function LoadSpots(routeName: string, Overlays: Array<Spot | Route>, icon: AMap.
     var i = Overlays.length;
     //从RouteSpots中导入POI数据
     RouteSpots[routeName].forEach((s) => {
-        let spot = new Spot(i, s.sspot, [s.lon, s.lat], s.path, s.sdate, s.author, s.desc, icon, iconselect)
+        let spot = new Spot(i, s.sspot, [s.lon, s.lat], s.path, s.sdate, s.author, s.desc, icon, iconselect);
+        
         Overlays.push(spot)
         Loaded.push(spot)
         map.add(spot.marker)

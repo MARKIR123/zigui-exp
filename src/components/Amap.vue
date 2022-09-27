@@ -52,7 +52,7 @@ function initMap() {
             }
 
             Olstore.$state = {
-                Overlays: new AMap.OverlayGroup(),
+                Overlays: [],
 
                 Icon: new AMap.Icon({
                     size: new AMap.Size(40, 50),
@@ -66,20 +66,19 @@ function initMap() {
                     imageSize: new AMap.Size(40, 50)
                 }),
 
-                Linestyle: new AMap.PolylineOptions({
+                Linestyle: ({
+                    isOutline: false,
+                }),
+
+                Linestylesl: ({
                     isOutline: true,
                     borderWeight: 3,
                     outlineColor: '#FFFFFF',
                     strokeOpacity: 0.8
                 }),
 
-                Linestylesl: new AMap.PolylineOptionssetOptions({
-                    isOutline: false,
-                }),
-
                 CurrentPos: [0, 0]
             }
-
 
             //添加插件
             AMap.plugin(["AMap.Scale", "AMap.Geolocation"], function () {
