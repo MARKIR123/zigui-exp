@@ -20,13 +20,13 @@ let SanxiaSpots: Array<Spot> = [
 ]
 
 let ZhongjiachongSpots: Array<Spot> = [
-    { path: 'zhangjiachong/jiancezhan.jpg', sspot: '张家冲水土流失监测站', sdate: '2022.8.31', lon: 110.964393, lat: 30.777775, author: '刘劼' },
-    { path: 'zhangjiachong/xiuxidian.jpg', sspot: '张家冲休息点', sdate: '2022.8.31', lon: 110.96305, lat: 30.780217, author: '刘劼' },
-    { path: 'zhangjiachong/shiyantian.jpg', sspot: '张家冲水土流失治理试验田', sdate: '2022.8.31', lon: 110.963169, lat: 30.779521, author: '刘劼' },
-    { path: 'zhangjiachong/minbaozhan.jpg', sspot: '民爆站', sdate: '2022.8.31', lon: 110.949631, lat: 30.76774, author: '刘劼' },
-    { path: 'zhangjiachong/gangou.jpg', sspot: '干沟', sdate: '2022.8.31', lon: 110.948073, lat: 30.768518, author: '刘劼' },
-    { path: 'zhangjiachong/doushantuo.jpg', sspot: '陡山沱组岩层', sdate: '2022.8.31', lon: 110.941298, lat: 30.756202, author: '刘劼' },
-    { path: 'zhangjiachong/riyuedong.jpg', sspot: '泗溪河流侵蚀地貌观察', sdate: '2022.8.31', lon: 110.939705, lat: 30.75554, author: '刘劼' },
+    { path: 'zhangjiachong/jiancezhan.jpg', sspot: '张家冲水土流失监测站', sdate: '2022.8.31', lon: 110.964393, lat: 30.777775, author: '刘劼', desc: '降雨是影响区内水土流失的主要因素之一。流域下游汇流区设置径流泥沙观测站，以记录河水的每月携沙总量，并结合降雨资料，定量分析流域降雨量与水土流失量的关系' },
+    { path: 'zhangjiachong/xiuxidian.jpg', sspot: '张家冲休息点', sdate: '2022.8.31', lon: 110.96305, lat: 30.780217, author: '刘劼', desc: '无' },
+    { path: 'zhangjiachong/shiyantian.jpg', sspot: '张家冲水土流失治理试验田', sdate: '2022.8.31', lon: 110.963169, lat: 30.779521, author: '刘劼', desc: '研究土地利用类型对区内水土流失的影响。自左至右依次为石坎梯田玉米小区、土坎梯田柑橘小区、土坎柑橘小区、坡篱柑橘小区、坡篱茶小区、坡篱柑橘小区、坡篱玉米小区、坡地茶小区、坡地柑橘小区和荒坡地小区。' },
+    { path: 'zhangjiachong/minbaozhan.jpg', sspot: '民爆站', sdate: '2022.8.31', lon: 110.949631, lat: 30.76774, author: '刘劼', desc: '无' },
+    { path: 'zhangjiachong/gangou.jpg', sspot: '干沟', sdate: '2022.8.31', lon: 110.948073, lat: 30.768518, author: '刘劼', desc: '无' },
+    { path: 'zhangjiachong/doushantuo.jpg', sspot: '陡山沱组岩层', sdate: '2022.8.31', lon: 110.941298, lat: 30.756202, author: '刘劼', desc: '陡山沱组原称“陡山沱层”，属中国南方震旦系上统中部,以黑色页岩、泥岩、泥灰岩、砂页岩等为主。个别地区顶部含磷块岩，部分地区底部以碳酸盐为主,命名剖面位于湖北宜昌县莲沱镇大桥东端之山坡，参考剖面位于宜昌县三斗坪镇田家园子。' },
+    { path: 'zhangjiachong/riyuedong.jpg', sspot: '泗溪河流侵蚀地貌观察', sdate: '2022.8.31', lon: 110.939705, lat: 30.75554, author: '刘劼', desc: '泗溪原本是条地下河，河水在地下流淌，上面有厚厚的岩层覆盖，岩层中发育不少垂直的落水洞，像天窗一样联通地表和地下河。随着溶蚀作用和坍塌的进行，落水洞逐渐扩大成为天坑，数个天坑串联，最终让泗溪从地下河变成了普通的地表河流' },
 
 ]
 

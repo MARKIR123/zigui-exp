@@ -5,9 +5,9 @@
     <v-row>
         <v-col class="d-flex justify-end">
             <v-toolbar dense floating height="48" rounded="lg">
-                <v-autocomplete :items="[]" :filter="searchFilter" v-model:search="search" color="blue"
+                <v-autocomplete :items="olStore.Searchlist" :filter="searchFilter" v-model:search="search" color="blue"
                     item-title="name" item-value="value" prepend-icon="mdi-magnify" hide-no-data hide-details
-                    return-object v-on:keydown.enter="" hide-selected>
+                    return-object v-on:keydown.enter="SearchToFocus(search)" hide-selected>
                     <!-- <template v-slot:no-data>
                         <v-list-item>
                             <v-list-item-title>
@@ -83,12 +83,12 @@
                     </v-menu>
                 </div>
 
-                <v-btn icon @click="test_over()">
+                <v-btn icon @click="test_over('111')">
                     <v-icon>mdi-printer</v-icon>
                 </v-btn>
 
                 <div class="text-center">
-                    <v-menu offset-y>
+                    <v-menu>
                         <template v-slot:activator="{ isActive, props }">
                             <v-btn icon rounded v-bind="props">
                                 <v-icon>mdi-dots-horizontal</v-icon>
@@ -96,7 +96,8 @@
                         </template>
                         <v-list>
                             <v-list-item>
-                                <v-switch v-model="swtichTheme" color="secondary" :label="theme.global.name.value">
+                                <v-switch v-model="swtichTheme" color="secondary" @change="changeTheme"
+                                    :label="theme.global.name.value">
                                 </v-switch>
                             </v-list-item>
                         </v-list>
@@ -119,7 +120,7 @@
 
         <v-divider></v-divider>
         <v-expansion-panels focusable>
-            <v-expansion-panel v-for="(ol, i) in olStore.Overlays" :key="i" @click="">
+            <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="focus(ol)">
                 <v-expansion-panel-content v-if="ol.type == 'Spot'">
                     <v-expansion-panel-title class="font-weight-thin">
                         <v-icon>
@@ -131,26 +132,42 @@
                     </v-expansion-panel-title>
 
                     <v-expansion-panel-text>
-                        <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
+                        <v-text-field variant="underlined" v-model="ol.id" :disabled="true" hide-details
                             class="font-weight-thin" height="10">
                             ID:
                         </v-text-field>
-                        <v-text-field variant="underlined" :model-value="(ol as Spot).infowindow.name"
-                            v-on:keydown.enter="" :disabled="!Editing" hide-details class="font-weight-thin">
+                        <v-text-field variant="underlined" v-model="(ol as Spot).infowindow.name"
+                            v-on:keydown.enter="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
+                            hide-details class="font-weight-thin">
                             地点:
                         </v-text-field>
-                        <v-text-field variant="underlined" :model-value="(ol as Spot).lnglat" :disabled="true"
-                            hide-details class="font-weight-thin">
+                        <v-text-field variant="underlined" v-model="(ol as Spot).lnglat" :disabled="!ol.Onediting"
+                            v-on:keydown.enter="() => {(ol as Spot).setPosition((ol as Spot).lnglat)}" hide-details
+                            class="font-weight-thin">
                             坐标:
                         </v-text-field>
 
-                        <v-textarea variant="underlined" :model-value="(ol as Spot).infowindow.desc"
-                            :disabled="!Editing" auto-grow class="font-weight-thin">
+                        <v-textarea variant="underlined" v-model="(ol as Spot).infowindow.desc"
+                            v-on:keydown.enter="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
+                            auto-grow class="font-weight-thin">
                         </v-textarea>
 
-                        <v-container class="px-0" fluid>
-                            <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
+                        <v-container class="px-0">
+                            <v-row>
+                                <v-col>
+                                    <v-switch v-model="ol.Onediting" @click.stop="() => {}" color="secondary"
+                                        label="Edit">
+                                    </v-switch>
+                                </v-col>
+                                <v-col>
+                                    <v-btn variant="text" color="red" class="mt-3" @click.stop="remove(ol, i)">
+                                        Delete
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+
                         </v-container>
+
                     </v-expansion-panel-text>
 
 
@@ -167,22 +184,35 @@
                     </v-expansion-panel-title>
 
                     <v-expansion-panel-text>
-                        <v-text-field variant="underlined" :model-value="ol.id" :disabled="true" hide-details
+                        <v-text-field variant="underlined" v-model="ol.id" :disabled="true" hide-details
                             class="font-weight-thin" height="10">
                             ID:
                         </v-text-field>
-                        <v-text-field variant="underlined" :model-value="(ol as Route).name" v-on:keydown.enter=""
-                            :disabled="!Editing" hide-details class="font-weight-thin">
+                        <v-text-field variant="underlined" v-model="(ol as Route).desc" :disabled="!ol.Onediting"
+                            hide-details class="font-weight-thin">
                             地点:
                         </v-text-field>
 
-                        <v-textarea variant="underlined" :model-value="(ol as Route).name" :disabled="!Editing"
+                        <v-textarea variant="underlined" v-model="(ol as Route).name" :disabled="!ol.Onediting"
                             auto-grow class="font-weight-thin">
                         </v-textarea>
 
-                        <v-container class="px-0" fluid>
-                            <v-switch v-model="Editing" @click="changeTheme" color="secondary" label="Edit"></v-switch>
+                        <v-container class="px-0">
+                            <v-row>
+                                <v-col>
+                                    <v-switch v-model="ol.Onediting" @click.spot="() => {}" color="secondary"
+                                        label="Edit">
+                                    </v-switch>
+                                </v-col>
+                                <v-col>
+                                    <v-btn variant="text" color="red" class="mt-3" @click.stop="remove(ol, i)">
+                                        Delete
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+
                         </v-container>
+
                     </v-expansion-panel-text>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -196,11 +226,10 @@ import { useStore } from '../index/store';
 import { useOlStore } from '../index/Olstore';
 import { LoadSpots, LoadRoute } from '../utils/LoadOl';
 import setSource from '../utils/setSource';
-import { drawSpot } from '../utils/drawSpots';
-import { drawRoute } from '../utils/drawRoute';
 import { Spot, Route } from '../utils/type';
 import { ref } from 'vue';
 import { useTheme } from 'vuetify/lib/framework.mjs';
+import { storeToRefs } from 'pinia';
 
 const mapStore = useStore()
 
@@ -229,13 +258,15 @@ var drawItems = [
     { title: 'Draw Route' }
 ]
 
+var { Overlays } = storeToRefs(olStore)
+
 var currentRoute = ref('')
 
 var currentObj: Spot | Route;
 
 var search = ref('');
 
-var Editing = ref(false);
+var EditS = ref('');
 
 var swtichTheme = ref(false);
 
@@ -268,37 +299,39 @@ const setRoute = (routeName: string, route: string, onloaded: boolean, index: nu
         //提示路线已被加载
     }
     else {
-        let Loaded: Array<Spot | Route> = [];
+        let Loaded: Array<AMap.Marker | AMap.Polyline> = [];
         Loaded = [...LoadSpots(route, olStore.Overlays, olStore.Icon, olStore.IconSelect, mapStore.Map), LoadRoute(route, olStore.Overlays, olStore.Linestyle, olStore.Linestylesl, mapStore.Map)]
         currentRoute.value = routeName;
         routeItems[index].onloaded = true
+        mapStore.Map.setFitView(Loaded, false, [50, 50, 50, 50])
     }
     //提示路线加载成功
 }
 
-// const focus = (ol: extData) => {
-//     if (currentObj == undefined) {
-//         ol.onFocus(18)
-//         ol.onActive()
-//         currentObj = ol;
-//     }
-//     else {
-//         currentObj.onPassive()
-//         ol.onFocus(18)
-//         ol.onActive()
-//         currentObj = ol;
-//     }
-// }
+const focus = (ol: Spot | Route) => {
+    if (currentObj == undefined) {
+        ol.onFocus(mapStore.Map)
+        currentObj = ol;
+    }
+    else {
+        currentObj.setNormal()
+        ol.onFocus(mapStore.Map)
+        currentObj = ol;
+    }
+}
 
-// const findOl = (name: string): boolean => {
-//     olStore.Overlayslist.forEach((ol) => {
-//         if (ol.name == name) {
-//             focus(ol)
-//             return true;
-//         }
-//     })
-//     return false;
-// }
+const remove = (ol: Spot | Route, index: number) => {
+    ol.delete()
+    olStore.Overlays.splice(index, 1)
+}
+
+const SearchToFocus = (name: string) => {
+    Overlays.value.forEach((ol) => {
+        if ((ol as Spot).infowindow.name == name || (ol as Route).name == name) {
+            ol.onFocus(mapStore.Map)
+        }
+    })
+}
 
 const Edit = () => {
 
@@ -308,9 +341,8 @@ const changeTheme = () => {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
-const test_over = () => {
-    console.log(olStore.Overlays);
-    
+const test_over = (s: any) => {
+    console.log('OL[0]infow:', (olStore.Overlays[0] as Spot).infowindow);
 }
 
 </script>

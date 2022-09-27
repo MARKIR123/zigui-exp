@@ -68,6 +68,11 @@ function initMap() {
 
                 Linestyle: ({
                     isOutline: false,
+                    showDir: true,
+                    strokeColor: '#3366bb',   // 线颜色
+                    strokeWeight: 10,          // 线宽
+                    lineJoin: 'round',
+                    lineCap: 'round',
                 }),
 
                 Linestylesl: ({
