@@ -1,4 +1,4 @@
-import "@amap/amap-jsapi-types";
+//import "@amap/amap-jsapi-types";
 import { getAssetsImages } from './getImage'
 
 class Photo {
@@ -24,7 +24,7 @@ class InfoWindow {
 
     constructor(name: string = '', img: string = '', date: string = '', author: string = '', desc: string = '', map: AMap.Map, lnglat: [number, number]) {
         this.name = name;
-        this.photo = new Photo(img, date, author)
+        this.photo = new Photo(img, author, date)
         this.desc = desc;
         this.window = new AMap.InfoWindow({
             anchor: 'middle-right',
@@ -43,9 +43,9 @@ class InfoWindow {
     //设置InfoWindow内容
     setContent(name: string = this.name, img: string = this.photo.img, date: string = this.photo.date, author: string = this.photo.author, desc: string = this.desc) {
         this.window.setContent((
-            `<div style="overflow: visible; width: 600px;height:min-content;background-color:#FFFFFF; border-radius: 30px;padding: 6px 0px 6px 0px;">
+            `<div id='InfoWindow' style="overflow: visible; width: 600px;height:min-content; border-radius: 30px;padding: 6px 0px 6px 0px;">
                 <p style="padding-left: 2rem;font-size: 32px;font-family: 'Microsoft JhengHei'">${name}</p>
-                <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei';color: #424242">By  ${author}    ${date}</p>
+                <p style="padding-left: 2rem;font-size: 16px;font-family: 'Microsoft JhengHei'">By  ${author}    ${date}</p>
                 <div>
                     <img src=${img} style="margin-left: -6px;margin-right: -6px;"  width="612"/>
                 </div>
@@ -89,7 +89,7 @@ export class Spot {
             icon: icon, // 自定义点标记
             position: lnglat, // 基点位置
             anchor: 'bottom-left', // 设置锚点方位
-            draggable: true,
+            draggable: false,
         })
         this.addOverEvent(map);
         this.addOutEvent();
@@ -141,7 +141,7 @@ export class Spot {
 
     addOutEvent() {
         this.marker.on('mouseout', () => {
-            this.setNormal();  
+            this.setNormal();
         })
     }
 
@@ -150,7 +150,7 @@ export class Spot {
     }
 
     addMoveEvent() {
-        this.marker.on('mousemove', () =>{
+        this.marker.on('mousemove', () => {
 
         })
     }
@@ -163,9 +163,36 @@ export class Spot {
     }
 
     onFocus(map: AMap.Map, zoom: number = 18) {
-        map.setZoomAndCenter(zoom,  [this.lnglat[0] - 0.002, this.lnglat[1]])
+        map.setZoomAndCenter(zoom, [this.lnglat[0] - 0.002, this.lnglat[1]])
         this.setActive()
         this.infowindow.open(map, this.lnglat)
+    }
+
+    onEdit() {
+        if (this.marker.getDraggable()) {
+            this.marker.setDraggable(false)
+            this.marker.off('dragstart', (e) => {
+
+            })
+            this.marker.off('dragging', (e) => {
+
+            })
+            this.marker.off('dragend', (e) => {
+
+            })
+        }
+        else {
+            this.marker.setDraggable(true)
+            this.marker.on('dragstart', (e) => {
+
+            })
+            this.marker.on('dragging', (e) => {
+
+            })
+            this.marker.on('dragend', (e) => {
+                this.setPosition(e.lnglat)
+            })
+        }
     }
 }
 
@@ -183,7 +210,6 @@ class Textmark {
                 'margin-bottom': '1rem',
                 'border-radius': '.8rem',
                 'background-color': '#3366bb',
-                'width': '6rem',
                 'border-width': '3px',
                 'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
                 'text-align': 'center',
@@ -194,7 +220,8 @@ class Textmark {
         })
     }
     setContent(name: string) {
-
+        this.content = name;
+        this.text.setText(name)
     }
 
     setPos(lnglat: [number, number]) {
@@ -238,6 +265,7 @@ export class Route {
         this.addOverEvent();
         this.addOutEvent();
         this.addRightEvent();
+        map.add(this.line)
     }
 
     //设置Route样式
@@ -275,6 +303,9 @@ export class Route {
 
     }
 
+    addPolyEditor() {
+    }
+
     onFocus(map: AMap.Map, zoom: number = 18) {
         map.setZoomAndCenter(zoom, this.line.getPath()[0])
         this.setActive()
@@ -283,5 +314,20 @@ export class Route {
     delete() {
         this.setNormal()
         this.line.remove()
+    }
+
+    onEdit(editor: any) {
+        if (this.Onediting) {
+            this.Onediting = false;
+            this.addOutEvent();
+            this.addOverEvent();
+            editor.close()
+        }
+        else {
+            this.Onediting = true;
+            this.line.clearEvents();
+            editor.setTarget(this.line)
+            editor.open()
+        }
     }
 }

@@ -1,4 +1,3 @@
-import { mapState, mapStores } from "pinia";
 import { Routes } from "../index/routeindex";
 import { RouteSpots } from "../index/spotIndex";
 import { Spot, Route } from "./type"
@@ -20,7 +19,6 @@ function LoadRoute(routeName: string, Overlays: Array<Spot | Route>, style: AMap
     let route = new Route(i, Routes[routeName].desc, Routes[routeName].path, Routes[routeName].desc, style, astyle, map)
 
     Overlays.push(route)
-    map.add(route.line)
     return route.line
 }
 

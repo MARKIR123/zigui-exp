@@ -11,23 +11,11 @@ export const useOlStore = defineStore('olstore', {
       IconSelect: {} as AMap.Icon,
       Linestyle: {} as AMap.PolylineOptions,
       Linestylesl: {} as AMap.PolylineOptions,
+      PolyEditor: {},
       CurrentPos: [0, 0]
     }
   },
   getters: {
-    // Overlayslist(): extData[] {
-    //   if (this.Overlays.CLASS_NAME == undefined) {
-    //     return []
-    //   }
-    //   else {
-    //     var exlist: extData[] = [];
-    //     this.Overlays.getOverlays().forEach((ol: AMap.Marker | AMap.Polyline) => {
-    //       exlist.push(ol.getExtData())
-    //     })
-    //     return exlist
-    //   }
-    // },
-
     Searchlist(): { name: string, value: number }[] {
       let Slist: Array<{ name: string, value: number }> = [];
       this.Overlays.forEach((ol) => {
@@ -40,5 +28,18 @@ export const useOlStore = defineStore('olstore', {
       })
       return Slist
     },
+
+    Overlayslist(): (AMap.Marker | AMap.Polyline)[] {
+      let Olist: (AMap.Marker | AMap.Polyline)[] = [];
+      this.Overlays.forEach((ol) => {
+        if (ol.type == 'Spot') {
+          Olist.push((ol as Spot).marker)
+        }
+        else if (ol.type == 'Route') {
+          Olist.push((ol as Route).line)
+        }
+      })
+      return Olist
+    }
   }
 })

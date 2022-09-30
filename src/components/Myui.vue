@@ -1,6 +1,9 @@
 <template>
     <div class="alert-box">
-        <v-alert type="success" elevation="12">I'm a success alert.</v-alert>
+        <v-snackbar v-model=ShowAlert class="font-weight-thin" style="font-family: 'Microsoft JhengHei'"
+            :timeout="AlertTO" :color=AlertColor>
+            {{ Message }}
+        </v-snackbar>
     </div>
     <v-row>
         <v-col class="d-flex justify-end">
@@ -8,23 +11,8 @@
                 <v-autocomplete :items="olStore.Searchlist" :filter="searchFilter" v-model:search="search" color="blue"
                     item-title="name" item-value="value" prepend-icon="mdi-magnify" hide-no-data hide-details
                     return-object v-on:keydown.enter="SearchToFocus(search)" hide-selected>
-                    <!-- <template v-slot:no-data>
-                        <v-list-item>
-                            <v-list-item-title>
-                                搜索。。。
-                                <strong>Cryptocurrency</strong>
-                            </v-list-item-title>
-                        </v-list-item>
-                    </template> -->
                     <template v-slot:item:any="{ item }">
                         <v-item>{{item.title}}</v-item>
-                        <!-- <v-list-item-avatar color="indigo" class="headline font-weight-light white--text">
-                                {{ item['title'] }}
-                            </v-list-item-avatar> -->
-                        <!-- <v-list-item-title v-text="item['title']"></v-list-item-title>
-                            <v-list-item-action>
-                                <v-icon>mdi-coin</v-icon>
-                            </v-list-item-action> -->
 
                     </template>
                 </v-autocomplete>
@@ -46,7 +34,7 @@
                         </template>
                         <v-list>
                             <v-list-item v-for="(item, index) in drawItems" :key="index" @click="">
-                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                <v-list-item-title @click=item.event>{{ item.title }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -121,7 +109,7 @@
         <v-divider></v-divider>
         <v-expansion-panels focusable>
             <v-expansion-panel v-for="(ol, i) in Overlays" :key="i" @click="focus(ol)">
-                <v-expansion-panel-content v-if="ol.type == 'Spot'">
+                <div v-if="ol.type == 'Spot'">
                     <v-expansion-panel-title class="font-weight-thin">
                         <v-icon>
                             mdi-map-marker
@@ -136,27 +124,46 @@
                             class="font-weight-thin" height="10">
                             ID:
                         </v-text-field>
-                        <v-text-field variant="underlined" v-model="(ol as Spot).infowindow.name"
-                            v-on:keydown.enter="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
+                        <v-text-field variant="underlined" v-model="(ol as Spot).infowindow.name" color="red-lighten-1"
+                            @update:model-value="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
                             hide-details class="font-weight-thin">
                             地点:
                         </v-text-field>
                         <v-text-field variant="underlined" v-model="(ol as Spot).lnglat" :disabled="!ol.Onediting"
-                            v-on:keydown.enter="() => {(ol as Spot).setPosition((ol as Spot).lnglat)}" hide-details
+                            color="pink darken-4"
+                            @update:model-value="() => {(ol as Spot).setPosition((ol as Spot).lnglat)}" hide-details
                             class="font-weight-thin">
                             坐标:
                         </v-text-field>
+                        <v-text-field v-if="ol.Onediting" variant="underlined" color="purple lighten-1"
+                            v-model="(ol as Spot).infowindow.photo.img"
+                            @update:model-value="() => {(ol as Spot).infowindow.setContent()}" hide-details
+                            class="font-weight-thin">
+                            照片路径:
+                        </v-text-field>
+                        <v-text-field v-if="ol.Onediting" variant="underlined" color="indigo lighten-1"
+                            v-model="(ol as Spot).infowindow.photo.author"
+                            @update:model-value="() => {(ol as Spot).infowindow.setContent()}" hide-details
+                            class="font-weight-thin">
+                            照片拍摄:
+                        </v-text-field>
+                        <v-text-field v-if="ol.Onediting" variant="underlined" color="green lighten-1"
+                            v-model="(ol as Spot).infowindow.photo.date"
+                            @update:model-value="() => {(ol as Spot).infowindow.setContent()}" hide-details
+                            class="font-weight-thin">
+                            拍摄日期:
+                        </v-text-field>
 
-                        <v-textarea variant="underlined" v-model="(ol as Spot).infowindow.desc"
-                            v-on:keydown.enter="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
+                        <v-textarea variant="underlined" v-model="(ol as Spot).infowindow.desc" color="orange lighten-1"
+                            @update:model-value="() => {(ol as Spot).infowindow.setContent()}" :disabled="!ol.Onediting"
                             auto-grow class="font-weight-thin">
                         </v-textarea>
 
                         <v-container class="px-0">
                             <v-row>
                                 <v-col>
-                                    <v-switch v-model="ol.Onediting" @click.stop="() => {}" color="secondary"
-                                        label="Edit">
+                                    <v-switch v-model="ol.Onediting" @click.stop="(ol as Spot).onEdit()"
+                                        color="secondary" label="Edit">
                                     </v-switch>
                                 </v-col>
                                 <v-col>
@@ -171,9 +178,9 @@
                     </v-expansion-panel-text>
 
 
-                </v-expansion-panel-content>
+                </div>
 
-                <v-expansion-panel-content v-if="ol.type == 'Route'">
+                <div v-if="ol.type == 'Route'">
                     <v-expansion-panel-title class="font-weight-thin">
                         <v-icon>
                             mdi-vector-polyline
@@ -188,20 +195,20 @@
                             class="font-weight-thin" height="10">
                             ID:
                         </v-text-field>
-                        <v-text-field variant="underlined" v-model="(ol as Route).desc" :disabled="!ol.Onediting"
-                            hide-details class="font-weight-thin">
+                        <v-text-field variant="underlined" v-model="(ol as Route).name" :disabled="!ol.Onediting"
+                            @update:model-value="(ol as Route).textmarker.setContent((ol as Route).name)" hide-details class="font-weight-thin">
                             地点:
                         </v-text-field>
 
-                        <v-textarea variant="underlined" v-model="(ol as Route).name" :disabled="!ol.Onediting"
-                            auto-grow class="font-weight-thin">
+                        <v-textarea variant="underlined" v-model="(ol as Route).desc" :disabled="!ol.Onediting"
+                            @update:model-value="" auto-grow class="font-weight-thin">
                         </v-textarea>
 
                         <v-container class="px-0">
                             <v-row>
                                 <v-col>
-                                    <v-switch v-model="ol.Onediting" @click.spot="() => {}" color="secondary"
-                                        label="Edit">
+                                    <v-switch v-model="ol.Onediting" @click.stop="ol.onEdit(olStore.PolyEditor)"
+                                        color="secondary" label="Edit">
                                     </v-switch>
                                 </v-col>
                                 <v-col>
@@ -214,7 +221,7 @@
                         </v-container>
 
                     </v-expansion-panel-text>
-                </v-expansion-panel-content>
+                </div>
             </v-expansion-panel>
         </v-expansion-panels>
     </v-navigation-drawer>
@@ -244,6 +251,7 @@ var layerItems = [
     { title: 'Gaode Map' },
     { title: 'Gaode Satellite' },
 ]
+
 var routeItems = [
     { title: '三峡大坝实习路线', value: 'sanxia', onloaded: false },
     { title: '张家冲实习路线', value: 'zhangjiachong', onloaded: false },
@@ -253,9 +261,48 @@ var routeItems = [
     { title: '棺材岩实习路线', value: 'guancaiyan', onloaded: false },
 ]
 
+const drawSpot = () => {
+    mapStore.Map.on('click', (e) => {
+        let date = new Date();
+        let sdate = `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
+        let ns = new Spot(olStore.Overlays.length, '请输入标记名~', [e.lnglat.lng, e.lnglat.lat], '请输入图片路径~', sdate, '输入拍摄者~', '输入一段描述~', olStore.Icon, olStore.IconSelect, mapStore.Map)
+        olStore.Overlays.push(ns);
+        mapStore.Map.clearEvents('click')
+        Alert(`成功创建ID: ${olStore.Overlays.length} 标记~`, 'blue-lighten-2')
+    })
+
+}
+
+const drawRoute = () => {
+    let path: [number, number][] = [];
+    //let nr = new Route(olStore.Overlays.length, '请输入路线名~', [], '请输入描述~', olStore.Linestyle, olStore.Linestylesl, mapStore.Map)
+    let activeline = new AMap.Polyline();
+    mapStore.Map.add(activeline)
+    activeline.setOptions(olStore.Linestyle);
+    mapStore.Map.on('click', (e) => {
+        path.push([e.lnglat.lng, e.lnglat.lat])
+        activeline.setPath(path)
+    })
+    mapStore.Map.on('mousemove', (e) => {
+        if (path.length >= 1) {
+            activeline.setPath([...path, [e.lnglat.lng, e.lnglat.lat]])
+        }
+    })
+    mapStore.Map.on('rightclick', (e) => {
+        console.log('mapright!!');
+        activeline.remove()
+        mapStore.Map.clearEvents('click')
+        mapStore.Map.clearEvents('mousemove')
+        olStore.Overlays.push(new Route(olStore.Overlays.length, '请输入路线名~', path, '请输入描述~', olStore.Linestyle, olStore.Linestylesl, mapStore.Map))
+        mapStore.Map.clearEvents('rightclick')
+        Alert(`成功创建ID: ${olStore.Overlays.length} 路线~`, 'blue-lighten-2')
+    })
+
+}
+
 var drawItems = [
-    { title: 'Draw Spot' },
-    { title: 'Draw Route' }
+    { title: 'Draw Spot', event: drawSpot },
+    { title: 'Draw Route', event: drawRoute }
 ]
 
 var { Overlays } = storeToRefs(olStore)
@@ -266,7 +313,10 @@ var currentObj: Spot | Route;
 
 var search = ref('');
 
-var EditS = ref('');
+var ShowAlert = ref(false)
+var AlertTO = ref(2000);
+var AlertColor = ref('red lighten-4')
+var Message = ref('Alert Message here')
 
 var swtichTheme = ref(false);
 
@@ -278,7 +328,7 @@ const emitCP = () => {
 }
 
 const globalView = () => {
-    // mapStore.Map.setFitView(olStore.Overlays, false, [20, 20, 10, 10])
+    mapStore.Map.setFitView(olStore.Overlayslist, false, [20, 20, 10, 10])
 }
 
 const searchFilter = (item: { name: string, value: string }, queryText: string, itemText: string) => {
@@ -296,16 +346,18 @@ const setLayer = (layer: string) => {
 
 const setRoute = (routeName: string, route: string, onloaded: boolean, index: number) => {
     if (onloaded) {
-        //提示路线已被加载
+        Alert('该路线已加载!', 'red-lighten-3');
     }
     else {
         let Loaded: Array<AMap.Marker | AMap.Polyline> = [];
         Loaded = [...LoadSpots(route, olStore.Overlays, olStore.Icon, olStore.IconSelect, mapStore.Map), LoadRoute(route, olStore.Overlays, olStore.Linestyle, olStore.Linestylesl, mapStore.Map)]
         currentRoute.value = routeName;
         routeItems[index].onloaded = true
+
         mapStore.Map.setFitView(Loaded, false, [50, 50, 50, 50])
+        //提示路线加载成功
+        Alert('路线加载成功!', 'light-green-lighten-2');
     }
-    //提示路线加载成功
 }
 
 const focus = (ol: Spot | Route) => {
@@ -318,6 +370,13 @@ const focus = (ol: Spot | Route) => {
         ol.onFocus(mapStore.Map)
         currentObj = ol;
     }
+}
+
+const Alert = (message: string, color: string, timeout: number = 2000) => {
+    Message.value = message;
+    AlertColor.value = color;
+    AlertTO.value = timeout;
+    ShowAlert.value = true;
 }
 
 const remove = (ol: Spot | Route, index: number) => {
@@ -333,16 +392,13 @@ const SearchToFocus = (name: string) => {
     })
 }
 
-const Edit = () => {
-
-}
-
 const changeTheme = () => {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
 const test_over = (s: any) => {
-    console.log('OL[0]infow:', (olStore.Overlays[0] as Spot).infowindow);
+    console.log('AlertMessage:', Message, 'AlertColor:', AlertColor);
+    console.log(routeItems);
 }
 
 </script>
@@ -361,9 +417,9 @@ const test_over = (s: any) => {
     --v-icon-size-multiplier: 1.6;
 }
 
-.v-icon {
+/* .v-icon {
     color: #616161;
-}
+} */
 
 .v-navigation-drawer__content {
     overflow-y: auto !important;

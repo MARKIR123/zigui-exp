@@ -51,6 +51,48 @@ function initMap() {
                 }),
             }
 
+            //添加插件
+            AMap.plugin(["AMap.Scale", "AMap.Geolocation", "AMap.PolyEditor"], function () {
+                //异步同时加载多个插件
+                mapStore.Map.addControl(new AMap.Scale({
+                    position: { right: '3px', bottom: '7px' }
+                })); //显示当前地图中心的比例尺
+
+                geolocation = new AMap.Geolocation({
+                    // 是否使用高精度定位，默认：true
+                    enableHighAccuracy: true,
+                    // 设置定位超时时间，默认：无穷大
+                    timeout: 10000,
+                    // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
+                    buttonOffset: new AMap.Pixel(10, 20),
+                    //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                    zoomToAccuracy: true,
+                    //  定位按钮的排放位置,  RB表示右下
+                    buttonPosition: 'RB'
+                })
+
+                AMap.Event.addListener(geolocation, 'complete', onComplete)
+                AMap.Event.addListener(geolocation, 'error', onError)
+
+                GetCurrentPos = () => {
+                    geolocation.getCurrentPosition()
+                }
+
+                var Editor = new AMap.PolyEditor(mapStore.Map, new AMap.Polyline())
+
+
+                function onComplete(data: any) {
+                    // data是具体的定位信息
+                    console.log('当前位置:', data.position);
+                    Olstore.CurrentPos = [data.position.lng, data.position.lat]
+                    mapStore.Map.setZoomAndCenter(19, Olstore.CurrentPos as [number, number], false)
+                }
+
+                function onError(data: any) {
+                    // 定位出错
+                    console.log(data);
+                }
+            });
             Olstore.$state = {
                 Overlays: [],
 
@@ -82,49 +124,10 @@ function initMap() {
                     strokeOpacity: 0.8
                 }),
 
+                PolyEditor: new AMap.PolyEditor(mapStore.Map, new AMap.Polyline()),
+
                 CurrentPos: [0, 0]
             }
-
-            //添加插件
-            AMap.plugin(["AMap.Scale", "AMap.Geolocation"], function () {
-                //异步同时加载多个插件
-                mapStore.Map.addControl(new AMap.Scale({
-                    position: { right: '3px', bottom: '7px' }
-                })); //显示当前地图中心的比例尺
-
-                geolocation = new AMap.Geolocation({
-                    // 是否使用高精度定位，默认：true
-                    enableHighAccuracy: true,
-                    // 设置定位超时时间，默认：无穷大
-                    timeout: 10000,
-                    // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
-                    buttonOffset: new AMap.Pixel(10, 20),
-                    //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-                    zoomToAccuracy: true,
-                    //  定位按钮的排放位置,  RB表示右下
-                    buttonPosition: 'RB'
-                })
-
-                AMap.Event.addListener(geolocation, 'complete', onComplete)
-                AMap.Event.addListener(geolocation, 'error', onError)
-
-                GetCurrentPos = () => {
-                    geolocation.getCurrentPosition()
-                }
-
-
-                function onComplete(data: any) {
-                    // data是具体的定位信息
-                    console.log('当前位置:', data.position);
-                    Olstore.CurrentPos = [data.position.lng, data.position.lat]
-                    mapStore.Map.setZoomAndCenter(19, Olstore.CurrentPos as [number, number], false)
-                }
-
-                function onError(data: any) {
-                    // 定位出错
-                    console.log(data);
-                }
-            });
 
             //var path: any[] = []
 
