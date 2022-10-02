@@ -10,7 +10,6 @@
 <script lang="ts" setup>
 import Amap from './components/Amap.vue'
 import Myui from './components/Myui.vue'
-
 </script>
 
 <style>

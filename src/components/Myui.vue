@@ -71,7 +71,7 @@
                     </v-menu>
                 </div>
 
-                <v-btn icon @click="test_over('111')">
+                <v-btn icon @click="print">
                     <v-icon>mdi-printer</v-icon>
                 </v-btn>
 
@@ -87,6 +87,11 @@
                                 <v-switch v-model="swtichTheme" color="secondary" @change="changeTheme"
                                     :label="theme.global.name.value">
                                 </v-switch>
+                            </v-list-item>
+                            <v-list-item href="https://github.com/MARKIR123">
+                                <v-list-item-title class="text-light-blue darken-3">
+                                    @Asukai
+                                </v-list-item-title>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -196,7 +201,8 @@
                             ID:
                         </v-text-field>
                         <v-text-field variant="underlined" v-model="(ol as Route).name" :disabled="!ol.Onediting"
-                            @update:model-value="(ol as Route).textmarker.setContent((ol as Route).name)" hide-details class="font-weight-thin">
+                            @update:model-value="(ol as Route).textmarker.setContent((ol as Route).name)" hide-details
+                            class="font-weight-thin">
                             地点:
                         </v-text-field>
 
@@ -394,6 +400,10 @@ const SearchToFocus = (name: string) => {
 
 const changeTheme = () => {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+}
+
+const print = () => {
+    window.print()
 }
 
 const test_over = (s: any) => {
